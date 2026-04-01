@@ -1,24 +1,24 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
-import { compile } from "./compile.js";
+import { compilar } from "./compile.js";
 
-const inputPath = process.argv[2];
+const caminhoEntrada = process.argv[2];
 
-if (!inputPath) {
+if (!caminhoEntrada) {
   console.error("Usage: npm run dev -- <arquivo.py>");
   process.exit(1);
 }
 
-const absolutePath = resolve(inputPath);
-const source = readFileSync(absolutePath, "utf-8");
+const caminhoAbsoluto = resolve(caminhoEntrada);
+const fonte = readFileSync(caminhoAbsoluto, "utf-8");
 
-const compiled = compile(source);
+const compilado = compilar(fonte);
 
-const outputPath = resolve(
-  absolutePath,
+const caminhoSaida = resolve(
+  caminhoAbsoluto,
   "..",
-  basename(absolutePath, ".py") + ".js"
+  basename(caminhoAbsoluto, ".py") + ".js"
 );
 
-writeFileSync(outputPath, compiled, "utf-8");
-console.log(`Arquivo compilado salvo em: ${outputPath}`);
+writeFileSync(caminhoSaida, compilado, "utf-8");
+console.log(`Arquivo compilado salvo em: ${caminhoSaida}`);

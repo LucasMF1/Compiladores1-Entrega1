@@ -60,10 +60,3 @@ def funcaoQualquer(a,b,c):
 
     
 
-    
-
-
-tokens = ["def", "{nome_funcao}", "(","{nome_variavel}",
-          ",",")",":","=","+","*","/","[","]","{","}","if",
-          "while","for","match","case","break","pass","try","not in","!=",
-          "==",">","<",">=","<=","+=","*=","/=","-=","None","True","False","return","","import","as","except"]
