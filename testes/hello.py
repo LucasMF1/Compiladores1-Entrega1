@@ -17,7 +17,7 @@ def funcaoQualquer(a,b,c):
 
     d.remove(2)
 
-    e["qualquer"] = 2
+    e["qualquer"] = 2.2
 
     try:
         raise Exception()
