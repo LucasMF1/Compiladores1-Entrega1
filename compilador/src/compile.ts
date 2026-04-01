@@ -30,11 +30,11 @@ function analisadorLexico(fonte: string): any {
       tokensEspecificados = [...tokensEspecificados, `operador_${token}`];
     }
 
-    if(!Number.isNaN(parseInt(token)) || !Number.isNaN(parseFloat(token))) {
-      tokensEspecificados = [...tokensEspecificados,`number_${token}`]
+    if (!Number.isNaN(parseInt(token)) || !Number.isNaN(parseFloat(token))) {
+      tokensEspecificados = [...tokensEspecificados, `number_${token}`]
     }
 
-    if()
+
 
 
 
