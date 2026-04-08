@@ -13,7 +13,7 @@
 //
 //
 
-const chamadas = ["{variavel}", "def", "{funcao}", "for", "in", "range", "return", "print", "case","break","pass", "try", "while", "match","except", "import","as","None","True","False","in"];
+const chamadas = [ "def", "for", "in", "range", "return", "print", "case","break","pass", "try", "while", "match","except", "import","as","None","True","False","in"];
 
 const operadores = ["=", "==", "+", "-", "*", "/", "%", "!=", ">","<",">=","<=", "*=", "/="];
 
@@ -55,3 +55,13 @@ export function teste(fonte: string) {
     console.log(tokensLexicos);
 
 }
+
+// chamada de teste
+teste(`
+def chamadas(x, y):
+    for i in range(h):
+        x + y
+    return x, y
+
+print(x, y)
+`);
