@@ -96,11 +96,11 @@ export class Parser {
   // ──────────────── Métodos utilitários do cursor ────────────────
 
   peek(offset = 0): Token {
-    return this.tokens[this.pos + offset] ?? this.tokens[this.tokens.length - 1];
+    return this.tokens[this.pos + offset] ?? this.tokens[this.tokens.length - 1]!;
   }
 
   advance(): Token {
-    const t = this.tokens[this.pos];
+    const t = this.tokens[this.pos]!;
     if (!this.isAtEnd()) this.pos++;
     return t;
   }
