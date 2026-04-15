@@ -16,8 +16,7 @@ export class IdentifierReader implements Reader {
    * Dígitos NÃO são aceitos na primeira posição (senão conflita com NumberReader).
    */
   canRead(char: string): boolean {
-    // TODO: retornar true se char é letra ou '_'
-    return false;
+    return /[a-zA-Z_]/.test(char);
   }
 
   /**
@@ -31,7 +30,18 @@ export class IdentifierReader implements Reader {
    *      caso contrário, TokenType.IDENTIFIER.
    */
   read(lexer: Lexer): Token {
-    // TODO: implementar conforme descrito acima
-    throw new Error("IdentifierReader.read not implemented");
+    const line = lexer.getLine();
+    const column = lexer.getColumn();
+
+    let lexema = "";
+    while (!lexer.isAtEnd() && /[a-zA-Z0-9_]/.test(lexer.peek())) {
+      lexema += lexer.advance();
+    }
+
+    const type = PALAVRAS_RESERVADAS.has(lexema)
+      ? TokenType.KEYWORD
+      : TokenType.IDENTIFIER;
+
+    return new Token(type, lexema, line, column);
   }
 }

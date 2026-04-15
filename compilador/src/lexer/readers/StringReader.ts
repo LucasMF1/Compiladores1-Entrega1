@@ -10,8 +10,7 @@ export class StringReader implements Reader {
    * o mesmo tipo de token, só precisam casar no início e no fim.
    */
   canRead(char: string): boolean {
-    // TODO: retornar true se char é '"' ou "'"
-    return false;
+    return char === '"' || char === "'";
   }
 
   /**
@@ -28,7 +27,24 @@ export class StringReader implements Reader {
    * e mantenha. Sugestão: guardar APENAS o conteúdo interno (sem as aspas).
    */
   read(lexer: Lexer): Token {
-    // TODO: implementar conforme descrito acima
-    throw new Error("StringReader.read not implemented");
+    const line = lexer.getLine();
+    const column = lexer.getColumn();
+    const quote = lexer.advance();
+
+    let lexema = "";
+    while (!lexer.isAtEnd() && lexer.peek() !== quote) {
+      if (lexer.peek() === "\n") {
+        throw new Error(`String não terminada em ${line}:${column}`);
+      }
+      lexema += lexer.advance();
+    }
+
+    if (lexer.isAtEnd()) {
+      throw new Error(`String não terminada em ${line}:${column}`);
+    }
+
+    lexer.advance();
+
+    return new Token(TokenType.STRING, lexema, line, column);
   }
 }
