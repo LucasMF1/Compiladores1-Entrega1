@@ -39,7 +39,7 @@
 %}
 
 %locations
-%error-verbose
+%define parse.error verbose
 
 /* -------------------------------------------------------------------------
  * Tipos semanticos dos tokens e nao-terminais.
