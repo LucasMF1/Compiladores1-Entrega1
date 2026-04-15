@@ -1,0 +1,9 @@
+[
+  {
+    "id": "hello",
+    "description": "Declaracoes simples com let e chamada de console.log convertidas para atribuicoes Python e print.",
+    "validity": "valid",
+    "input": "validos/hello.js",
+    "expectedOutput": "validos/hello.expected.py"
+  }
+]
