@@ -31,7 +31,7 @@
 
 %{
 #include "common.h"
-/* #include "parser.tab.h"  -- descomentar quando o parser existir */
+#include "parser.tab.h"
 %}
 
 %option noyywrap
