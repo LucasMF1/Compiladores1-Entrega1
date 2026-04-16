@@ -1,10 +1,3 @@
----
-layout: default
-title: Sobre o Projeto
-description: Visao geral do projeto, equipe, metodologia e links uteis.
-permalink: /paginas/sobre.html
----
-
 # Sobre o Projeto
 
 > Compilador JavaScript → Python | Disciplina de Compiladores 1 | PBL | Professor Sérgio Freitas.
