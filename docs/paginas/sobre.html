@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre o Projeto | Compiladores 1</title>
+  <meta name="description" content="Visao geral do projeto, equipe, metodologia e links uteis." />
+  <link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+  <header class="page-header">
+    <div class="container page-header__inner">
+      <a class="brand" href="../index.html">Compiladores 1</a>
+      <nav class="page-nav">
+        <a href="../index.html">Inicio</a>
+        <a href="./sobre.html">Sobre</a>
+        <a href="./sprints.html">Sprints</a>
+        <a href="./decisoes-tecnicas.html">Decisoes tecnicas</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <div class="container">
+      <article class="doc-card markdown-body">
+        <a class="back-link" href="../index.html">Voltar para a pagina inicial</a>
+
+        <h1>Sobre o Projeto</h1>
+
+        <blockquote>
+          Compilador JavaScript → Python | Disciplina de Compiladores 1 | PBL | Professor Sérgio Freitas.
+        </blockquote>
+
+        <hr />
+
+        <h2>Visão Geral</h2>
+        <p>
+          O objetivo deste projeto é construir um <strong>compilador</strong> que recebe um
+          programa escrito em um subconjunto de JavaScript e produz código Python equivalente
+          e funcionalmente correto.
+        </p>
+        <p>
+          O projeto é desenvolvido no contexto da disciplina de <strong>Compiladores 1</strong>,
+          aplicando a metodologia ágil <strong>Scrum</strong> com sprints semanais. Todas as
+          decisões técnicas são documentadas e justificadas ao longo do desenvolvimento.
+        </p>
+        <p>O fluxo completo do compilador é:</p>
+
+        <h4>Pipeline de compilação</h4>
+        <pre><code>programa.js
+    │
+    ▼
+┌─────────────┐
+│  Flex/Lexer │  lê o texto e quebra em tokens
+│  (lexer.l)  │  ex: "let x = 5" → [LET, ID("x"), ASSIGN, NUM(5)]
+└─────────────┘
+    │
+    ▼ fluxo de tokens
+┌─────────────┐
+│    Bison    │  verifica a gramática e monta a árvore
+│  (parser.y) │  ex: tokens → nó "declaração de variável"
+└─────────────┘
+    │
+    ▼ AST (Árvore Sintática Abstrata)
+┌─────────────┐
+│  Gerador de │  percorre a árvore e escreve Python
+│   código    │  ex: nó "declaração" → "x = 5"
+└─────────────┘
+    │
+    ▼
+programa.py</code></pre>
+
+        <hr />
+
+        <h2>Objetivo do Compilador</h2>
+        <p>
+          Traduzir programas escritos em um <strong>subconjunto de JavaScript</strong> para
+          <strong>Python</strong> equivalente, cobrindo diferentes instruções da linguagem.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Construção JS</th>
+              <th>Equivalente Python</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>let x = 5</code> / <code>const x = 5</code></td>
+              <td><code>x = 5</code></td>
+              <td>Implementado</td>
+            </tr>
+            <tr>
+              <td><code>if / else</code></td>
+              <td><code>if / else:</code></td>
+              <td>Em progresso</td>
+            </tr>
+            <tr>
+              <td><code>while (cond)</code></td>
+              <td><code>while cond:</code></td>
+              <td>Em progresso</td>
+            </tr>
+            <tr>
+              <td><code>for (let i = 0; i &lt; n; i++)</code></td>
+              <td><code>for i in range(...)</code></td>
+              <td>Em progresso</td>
+            </tr>
+            <tr>
+              <td><code>function nome(params)</code></td>
+              <td><code>def nome(params):</code></td>
+              <td>Em progresso</td>
+            </tr>
+            <tr>
+              <td><code>console.log(x)</code></td>
+              <td><code>print(x)</code></td>
+              <td>Em progresso</td>
+            </tr>
+            <tr>
+              <td>Operadores aritméticos e lógicos</td>
+              <td>Equivalentes diretos</td>
+              <td>Em progresso</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <blockquote>Esta tabela será atualizada conforme o avanço das sprints.</blockquote>
+
+        <hr />
+
+        <h2>Tecnologias Utilizadas</h2>
+
+        <h3>Linguagem principal</h3>
+        <ul>
+          <li><strong>C</strong> — implementação do driver, estruturas da AST e gerador de código</li>
+        </ul>
+
+        <h3>Ferramentas de geração de compilador</h3>
+        <ul>
+          <li><strong>Flex</strong> — gerador de analisador léxico.</li>
+          <li><strong>Bison</strong> — gerador de analisador sintático.</li>
+        </ul>
+
+        <h3>Infraestrutura</h3>
+        <ul>
+          <li><strong>GitHub</strong> — repositório, controle de versão e hospedagem da documentação</li>
+          <li><strong>GitHub Pages</strong> — site do projeto</li>
+          <li><strong>Shell Script</strong> — automação de build e testes (<code>build.sh</code>, <code>test.sh</code>)</li>
+        </ul>
+
+        <hr />
+
+        <h2>Estrutura do Repositório</h2>
+        <pre><code>compilador_flex_bison/
+│
+├── build.sh
+├── test.sh
+│
+├── src/
+│   ├── common.h
+│   ├── lexer.l
+│   ├── parser.y
+│   └── main.c
+│
+├── build/
+│   ├── parser.tab.c
+│   ├── parser.tab.h
+│   ├── lexer.yy.c
+│   └── compilador
+│
+├── tests/
+│
+└── docs/
+    ├── paginas/
+    └── index.html</code></pre>
+
+        <hr />
+
+        <h2>Fases do Compilador</h2>
+        <h3>1. Análise Léxica (Flex)</h3>
+        <p>
+          O arquivo <code>lexer.l</code> define as expressões regulares para todos os tokens
+          suportados, como palavras-reservadas, identificadores, literais, operadores e delimitadores.
+        </p>
+
+        <h3>2. Análise Sintática (Bison)</h3>
+        <p>
+          O arquivo <code>parser.y</code> define a gramática livre de contexto do subconjunto de
+          JavaScript suportado. O Bison gera um parser LALR(1) que consome o fluxo de tokens do
+          Flex e constrói a Árvore Sintática Abstrata (AST).
+        </p>
+
+        <h3>3. Análise Semântica</h3>
+        <p>Verificação de tipos, escopos e uso correto de variáveis e funções. A ser integrada na AST.</p>
+
+        <h3>4. Geração de Código</h3>
+        <p>Percorre a AST e emite código Python equivalente. Será implementada em entrega posterior.</p>
+
+        <hr />
+
+        <h2>Equipe</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Membro</th>
+              <th>Responsabilidade principal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Manuella Perlin</td><td>Análise léxica (Flex)</td></tr>
+            <tr><td>Otávio</td><td>Análise sintática (Bison)</td></tr>
+            <tr><td>João</td><td>Tabela de símbolos</td></tr>
+            <tr><td>Lucas Freitas</td><td>Testes</td></tr>
+            <tr><td>Gabriel Fae</td><td>Documentação e integração</td></tr>
+          </tbody>
+        </table>
+
+        <hr />
+
+        <h2>Metodologia</h2>
+        <p>
+          O projeto segue o <strong>Scrum</strong> com sprints semanais. O planejamento, as atas
+          de reunião e o progresso de cada sprint estão documentados ao longo do site.
+        </p>
+        <p>
+          Commits frequentes são feitos no GitHub ao longo de cada sprint, refletindo o progresso
+          incremental do projeto.
+        </p>
+
+        <hr />
+
+        <h2>Links Úteis</h2>
+        <ul>
+          <li><a href="https://github.com/LucasMF1/Compiladores1-Entrega1">Repositório no GitHub</a></li>
+          <li><a href="./sprints.html">Planejamento das Sprints</a></li>
+          <li><a href="./decisoes-tecnicas.html">Decisões Técnicas</a></li>
+          <li><a href="./problemas-solucoes.html">Problemas e Soluções</a></li>
+        </ul>
+      </article>
+    </div>
+  </main>
+</body>
+</html>
