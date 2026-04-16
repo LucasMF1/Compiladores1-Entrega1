@@ -1,3 +1,10 @@
+---
+layout: default
+title: Sobre o Projeto
+description: Visao geral do projeto, equipe, metodologia e links uteis.
+permalink: /paginas/sobre.html
+---
+
 # Sobre o Projeto
 
 > Compilador JavaScript → Python | Disciplina de Compiladores 1 | PBL | Professor Sérgio Freitas.
@@ -135,7 +142,7 @@ Percorre a AST e emite código Python equivalente. Será implementada em entrega
 
 ## Metodologia
 
-O projeto segue o **Scrum** com sprints semanais. O planejamento, as atas de reunião e o progresso de cada sprint estão documentados em [`sprints.md`](./sprints.md).
+O projeto segue o **Scrum** com sprints semanais. O planejamento, as atas de reuniao e o progresso de cada sprint estao documentados em [`sprints`](./sprints.html).
 
 Commits frequentes são feitos no GitHub ao longo de cada sprint, refletindo o progresso incremental do projeto.
 
@@ -144,9 +151,9 @@ Commits frequentes são feitos no GitHub ao longo de cada sprint, refletindo o p
 ## Links Úteis
 
 -  [Repositório no GitHub](https://github.com/LucasMF1/Compiladores1-Entrega1)
--  [Planejamento das Sprints](./paginas/sprints.md)
--  [Decisões Técnicas](./paginas/decisoes-tecnicas.md)
--  [Problemas e Soluções](./paginas/problemas-solucoes.md)
+-  [Planejamento das Sprints](./sprints.html)
+-  [Decisoes Tecnicas](./decisoes-tecnicas.html)
+-  [Problemas e Solucoes](./problemas-solucoes.html)
 
 ---
 
@@ -156,4 +163,3 @@ Commits frequentes são feitos no GitHub ao longo de cada sprint, refletindo o p
 | Versão | Data | Descrição | Autor | Revisor |
 | :--- | :--- | :--- | :--- | :--- |
 | `1.0`    | 16/04/2026 | Criação da página e adição de informações principaius | [Gabriel Fae](https://github.com/faehzin)|  | 
-

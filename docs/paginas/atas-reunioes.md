@@ -1,3 +1,10 @@
+---
+layout: default
+title: Atas de Reunioes
+description: Resumo das reunioes realizadas no projeto.
+permalink: /paginas/atas-reunioes.html
+---
+
 # Atas de reunião.
 
 ## REUNIÃO 01 

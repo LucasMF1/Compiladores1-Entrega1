@@ -1,3 +1,10 @@
+---
+layout: default
+title: Problemas e Solucoes
+description: Registro dos problemas encontrados e das solucoes adotadas.
+permalink: /paginas/problemas-solucoes.html
+---
+
 
 # Problemas e Soluções
 
