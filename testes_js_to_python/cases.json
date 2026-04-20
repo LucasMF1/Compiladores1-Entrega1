@@ -5,5 +5,103 @@
     "validity": "valid",
     "input": "validos/hello.js",
     "expectedOutput": "validos/hello.expected.py"
+  },
+  {
+    "id": "lexer_comentarios_espacos",
+    "description": "Tokens com comentarios de linha, comentarios de bloco e espacos em branco variados.",
+    "validity": "valid",
+    "input": "lexer/validos/comentarios_espacos.js",
+    "expectedOutput": "lexer/validos/comentarios_espacos.tokens"
+  },
+  {
+    "id": "lexer_identificadores",
+    "description": "Identificadores validos: simples, com underscore, com digitos, CamelCase e prefixos duplos.",
+    "validity": "valid",
+    "input": "lexer/validos/identificadores.js",
+    "expectedOutput": "lexer/validos/identificadores.tokens"
+  },
+  {
+    "id": "lexer_keywords",
+    "description": "Palavras-chave reservadas do subconjunto JS/Python suportado: def, if, while, for, match, case, break, pass, etc.",
+    "validity": "valid",
+    "input": "lexer/validos/keywords.js",
+    "expectedOutput": "lexer/validos/keywords.tokens"
+  },
+  {
+    "id": "lexer_numeros",
+    "description": "Literais numericos: inteiros de um digito, inteiros grandes, floats comuns e floats com precisao arbitraria.",
+    "validity": "valid",
+    "input": "lexer/validos/numeros.js",
+    "expectedOutput": "lexer/validos/numeros.tokens"
+  },
+  {
+    "id": "lexer_operadores",
+    "description": "Operadores aritmeticos, relacionais, logicos, de incremento/decremento e de atribuicao, com e sem ponto-e-virgula.",
+    "validity": "valid",
+    "input": "lexer/validos/operadores.js",
+    "expectedOutput": "lexer/validos/operadores.tokens"
+  },
+  {
+    "id": "lexer_strings",
+    "description": "Literais de string com aspas simples e duplas, contendo sequencias de escape comuns e caracteres Unicode.",
+    "validity": "valid",
+    "input": "lexer/validos/strings.js",
+    "expectedOutput": "lexer/validos/strings.tokens"
+  },
+  {
+    "id": "lexer_caractere_invalido",
+    "description": "Caracteres invalidos no subconjunto suportado (@, #, $, ~, ^, |, ?, :, backtick, barra invertida) devem causar erro lexico.",
+    "validity": "invalid",
+    "input": "lexer/invalidos/caractere_invalido.js",
+    "expectedError": "lexer/invalidos/caractere_invalido.err"
+  },
+  {
+    "id": "lexer_string_sem_fim",
+    "description": "String aberta sem fechamento de aspas deve causar erro lexico de string nao terminada.",
+    "validity": "invalid",
+    "input": "lexer/invalidos/string_sem_fim.js",
+    "expectedError": "lexer/invalidos/string_sem_fim.err"
+  },
+  {
+    "id": "parser_declaracoes",
+    "description": "Declaracoes de variaveis com let e const, com e sem inicializacao, devem ser aceitas pelo parser.",
+    "validity": "valid",
+    "input": "parser/validos/declaracoes.js"
+  },
+  {
+    "id": "parser_expressoes",
+    "description": "Expressoes aritmeticas, relacionais e logicas bem formadas devem ser aceitas pelo parser.",
+    "validity": "valid",
+    "input": "parser/validos/expressoes.js"
+  },
+  {
+    "id": "parser_expressao_invalida",
+    "description": "Expressao com operador binario sem operando direito deve causar erro sintatico.",
+    "validity": "invalid",
+    "input": "parser/invalidos/expressao_invalida.js"
+  },
+  {
+    "id": "parser_let_sem_identificador",
+    "description": "Declaracao let sem identificador a seguir deve causar erro sintatico.",
+    "validity": "invalid",
+    "input": "parser/invalidos/let_sem_identificador.js"
+  },
+  {
+    "id": "integracao_programa_simples",
+    "description": "Programa completo valido com declaracoes, expressoes e chamadas de funcao deve compilar sem erros.",
+    "validity": "valid",
+    "input": "integracao/validos/programa_simples.js"
+  },
+  {
+    "id": "integracao_erro_lexico",
+    "description": "Programa com caractere invalido deve falhar na fase lexica antes de chegar ao parser.",
+    "validity": "invalid",
+    "input": "integracao/invalidos/erro_lexico.js"
+  },
+  {
+    "id": "integracao_erro_sintatico",
+    "description": "Programa lexicamente valido mas sintaticamente incorreto deve falhar na fase de parsing.",
+    "validity": "invalid",
+    "input": "integracao/invalidos/erro_sintatico.js"
   }
 ]
