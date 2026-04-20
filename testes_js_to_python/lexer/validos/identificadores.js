@@ -1,0 +1,11 @@
+x
+nome
+contador
+_privado
+valor1
+minha_variavel
+CamelCase
+__init__
+define
+fort
+whileTrue
