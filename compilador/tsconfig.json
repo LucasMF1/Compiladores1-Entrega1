@@ -9,13 +9,13 @@
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "esnext",
-    "lib": ["esnext"],
+    "lib": ["esnext","ES2020","DOM"],
     "types": ["node"],
     // and npm install -D @types/node
 
     // Other Outputs
     "sourceMap": true,
-    "declaration": true,
+    "declaration": true,  
     "declarationMap": true,
 
     // Stricter Typechecking Options

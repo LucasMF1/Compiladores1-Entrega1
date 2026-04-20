@@ -1,3 +1,31 @@
+ç
+à
+x ¬ y
+x ¢ y
+x £ y
+x ¥ y
+x ³ y
+x ² y
+x³
+x²
+x ª y
+x º y
+x ¿ y
+x ¡ y
+x ° y
+x ¶ y
+x § y
+x ♦ y
+x © y
+x ® y
+x ◘ y
+x ◙ y
+x ☺ y
+x ☻ y
+x ♥ y
+x ♦ y
+x ♣ y
+x ♠ y
 x @ y 
 x # y
 x $ y
