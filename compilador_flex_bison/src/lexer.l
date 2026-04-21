@@ -169,9 +169,3 @@ ws         [ \t\f\r]+
   * ------------------------------------------------------------------------- */
 
 %%
-
-/*
- * Funcoes auxiliares (opcional): podem ir aqui ou em um .c separado.
- * Ex.: tratamento fino de strings, conversao de escapes, tabela de
- * palavras-chave, etc.
- */
