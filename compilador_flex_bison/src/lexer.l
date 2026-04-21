@@ -138,9 +138,10 @@ extern void lex_error(const char *lexeme, int line, int column);
 digit      [0-9]
 letter     [A-Za-z_$]
 ident      {letter}({letter}|{digit})*
-number     (({digit}+\.{digit}*)|(\.{digit}+)|({digit}+))?
+number     (({digit}+\.{digit}*)|(\.{digit}+)|({digit}+))([eE][+-]?{digit}+)?
 str_dq     \"([^\"\\\n]|\\.)*\"
 str_sq     \'([^\'\\\n]|\\.)*\'
+template   \`([^\\`\n]|\\.)*\`
 ws         [ \t\f\r]+
 
 %%
