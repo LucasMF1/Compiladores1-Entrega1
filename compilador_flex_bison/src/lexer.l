@@ -145,28 +145,6 @@ ws         [ \t\f\r]+
 
 %%
 
-// Comentário de linha
-"//"[^\n]*                 { yycolumn += yyleng; }
-
-// Comentário de bloco
-"/*"                       { yycolumn += yyleng; BEGIN(COMMENT); }
-
-<COMMENT>"*/"              { yycolumn += yyleng; BEGIN(INITIAL); }
-<COMMENT>\n                { yycolumn = 1; }
-<COMMENT>.                 { yycolumn += yyleng; }
-<COMMENT><<EOF>>           {
-                              lex_error("comentário de bloco não finalizado", yylineno, yycolumn);
-                              return 0;
-                           }
-
-// Espaços e tabulações
-{ws}                       { yycolumn += yyleng; }
-
-// Quebra de linha
-\n                         { yycolumn = 1; }
-
-
-
  /* -------------------------------------------------------------------------
   * Regras do analisador lexico
   *
@@ -189,5 +167,60 @@ ws         [ \t\f\r]+
   *
   *   .             { lex_error(yytext, yylineno, yycolumn); }
   * ------------------------------------------------------------------------- */
+
+
+// Comentário de linha
+"//"[^\n]*                 { yycolumn += yyleng; }
+
+// Comentário de bloco
+"/*"                       { yycolumn += yyleng; BEGIN(COMMENT); }
+
+<COMMENT>"*/"              { yycolumn += yyleng; BEGIN(INITIAL); }
+<COMMENT>\n                { yycolumn = 1; }
+<COMMENT>.                 { yycolumn += yyleng; }
+<COMMENT><<EOF>>           {
+                              lex_error("comentário de bloco não finalizado", yylineno, yycolumn);
+                              return 0;
+                           }
+
+// Espaços e tabulações
+{ws}                       { yycolumn += yyleng; }
+
+// Quebra de linha
+\n                         { yycolumn = 1; }
+
+//Palavras-chave, identificadores e literais
+{ident}                    {
+                              int kw = keyword_token(yytext);
+                              if (kw) {
+                                  RET(kw);
+                              }
+
+                              yylval.sval = strdup(yytext);
+                              RET(IDENTIFIER);
+                          }
+
+//Números, strings e template literals
+{number}                   {
+                              yylval.fval = strtod(yytext, NULL);
+                              RET(NUMBER);
+                          }
+
+{str_dq}                   {
+                              yylval.sval = copy_without_quotes(yytext, yyleng);
+                              RET(STRING);
+                          }
+
+{str_sq}                   {
+                              yylval.sval = copy_without_quotes(yytext, yyleng);
+                              RET(STRING);
+                          }
+
+{template}                 {
+                              yylval.sval = copy_without_quotes(yytext, yyleng);
+                              RET(TEMPLATE_STRING);
+                          }
+
+
 
 %%
