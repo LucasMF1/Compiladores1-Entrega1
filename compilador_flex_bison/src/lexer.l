@@ -255,4 +255,23 @@ ws         [ \t\f\r]+
 "^"                        { RET(BIT_XOR); }
 "~"                        { RET(BIT_NOT); }
 
+// Pontuação / delimitadores
+"("                        { RET(LPAREN); }
+")"                        { RET(RPAREN); }
+"{"                        { RET(LBRACE); }
+"}"                        { RET(RBRACE); }
+"["                        { RET(LBRACKET); }
+"]"                        { RET(RBRACKET); }
+","                        { RET(COMMA); }
+";"                        { RET(SEMI); }
+":"                        { RET(COLON); }
+"."                        { RET(DOT); }
+"?"                        { RET(QUESTION); }
+
+// Erros lexicos
+.                          {
+                              lex_error(yytext, yylineno, yycolumn);
+                              yycolumn += yyleng;
+                          }
+
 %%
