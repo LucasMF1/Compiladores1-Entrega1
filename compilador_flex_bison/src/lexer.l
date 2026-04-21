@@ -221,6 +221,38 @@ ws         [ \t\f\r]+
                               RET(TEMPLATE_STRING);
                           }
 
+// Operadores
+"==="                      { RET(STRICT_EQ); }
+"!=="                      { RET(STRICT_NEQ); }
+"=="                       { RET(EQ); }
+"!="                       { RET(NEQ); }
+"<="                       { RET(LE); }
+">="                       { RET(GE); }
+"&&"                       { RET(AND); }
+"||"                       { RET(OR); }
+"<<"                       { RET(SHL); }
+">>"                       { RET(SHR); }
+"++"                       { RET(INCREMENT); }
+"--"                       { RET(DECREMENT); }
+"+="                       { RET(PLUS_ASSIGN); }
+"-="                       { RET(MINUS_ASSIGN); }
+"*="                       { RET(TIMES_ASSIGN); }
+"/="                       { RET(DIV_ASSIGN); }
+"%="                       { RET(MOD_ASSIGN); }
+"=>"                       { RET(ARROW); }
 
+"="                        { RET(ASSIGN); }
+"+"                        { RET(PLUS); }
+"-"                        { RET(MINUS); }
+"*"                        { RET(TIMES); }
+"/"                        { RET(DIVIDE); }
+"%"                        { RET(MOD); }
+"!"                        { RET(NOT); }
+"<"                        { RET(LT); }
+">"                        { RET(GT); }
+"&"                        { RET(BIT_AND); }
+"|"                        { RET(BIT_OR); }
+"^"                        { RET(BIT_XOR); }
+"~"                        { RET(BIT_NOT); }
 
 %%
