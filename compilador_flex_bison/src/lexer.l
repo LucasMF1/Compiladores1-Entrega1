@@ -276,3 +276,33 @@ ws         [ \t\f\r]+
                           }
 
 %%
+
+/* MOCK DAS PARADAS DO BISON PARA TESTE
+YYSTYPE yylval; 
+
+void lex_error(const char *lexeme, int line, int column) {
+    fprintf(stderr, "[ERRO LEXICO] Linha %d, Coluna %d: Token não reconhecido '%s'\n", 
+            line, column, lexeme);
+}
+*/
+
+/* Função Main PARA TESTE 
+int main() {
+    int token;
+    printf("--- Iniciando Teste do Lexer ---\n");
+    
+    while ((token = yylex())) {
+        printf("[Linha %02d] Token: %-15d | Lexema: '%s'", yylineno, token, yytext);
+        
+        if (token == IDENTIFIER || token == STRING || token == TEMPLATE_STRING) {
+            printf(" | Valor: %s", yylval.sval);
+        } else if (token == NUMBER) {
+            printf(" | Valor: %g", yylval.fval);
+        }
+        printf("\n");
+    }
+    
+    printf("--- Fim do Arquivo ---\n");
+    return 0;
+}
+*/
