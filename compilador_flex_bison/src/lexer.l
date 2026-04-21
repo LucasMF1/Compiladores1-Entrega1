@@ -39,7 +39,7 @@
 
 int yycolumn = 1;
 
-//struct da tabela e tabela de palavras chave (ver com o otavio pra alinhar com o parser.y)
+    /* struct da tabela e tabela de palavras chave (ver com o otavio pra alinhar com o parser.y) */
 typedef struct {
     const char *lexeme;
     int token;
@@ -101,7 +101,7 @@ static char *copy_without_quotes(const char *text, size_t len) {
         return strdup("");
     }
 
-    char *out = (char *)malloc(len - 1); // (len - 2) chars + '\0'
+    char *out = (char *)malloc(len - 1); /* (len - 2) chars + '\0' */
     if (!out) {
         perror("malloc");
         exit(EXIT_FAILURE);
@@ -170,10 +170,10 @@ ws         [ \t\f\r]+
   * ------------------------------------------------------------------------- */
 
 
-// Comentário de linha
+    /* Comentário de linha */
 "//"[^\n]*                 { yycolumn += yyleng; }
 
-// Comentário de bloco
+    /* Comentário de bloco */
 "/*"                       { yycolumn += yyleng; BEGIN(COMMENT); }
 
 <COMMENT>"*/"              { yycolumn += yyleng; BEGIN(INITIAL); }
@@ -184,13 +184,13 @@ ws         [ \t\f\r]+
                               return 0;
                            }
 
-// Espaços e tabulações
+    /* Espaços e tabulações */
 {ws}                       { yycolumn += yyleng; }
 
-// Quebra de linha
+    /* Quebra de linha */
 \n                         { yycolumn = 1; }
 
-//Palavras-chave, identificadores e literais
+    /* Palavras-chave, identificadores e literais */
 {ident}                    {
                               int kw = keyword_token(yytext);
                               if (kw) {
@@ -201,7 +201,7 @@ ws         [ \t\f\r]+
                               RET(IDENTIFIER);
                           }
 
-//Números, strings e template literals
+    /* Números, strings e template literals */
 {number}                   {
                               yylval.fval = strtod(yytext, NULL);
                               RET(NUMBER);
@@ -222,7 +222,7 @@ ws         [ \t\f\r]+
                               RET(TEMPLATE_STRING);
                           }
 
-// Operadores
+    /* Operadores */
 "==="                      { RET(STRICT_EQ); }
 "!=="                      { RET(STRICT_NEQ); }
 "=="                       { RET(EQ); }
@@ -256,7 +256,7 @@ ws         [ \t\f\r]+
 "^"                        { RET(BIT_XOR); }
 "~"                        { RET(BIT_NOT); }
 
-// Pontuação / delimitadores
+    /* Pontuação / delimitadores */
 "("                        { RET(LPAREN); }
 ")"                        { RET(RPAREN); }
 "{"                        { RET(LBRACE); }
@@ -269,7 +269,7 @@ ws         [ \t\f\r]+
 "."                        { RET(DOT); }
 "?"                        { RET(QUESTION); }
 
-// Erros lexicos
+    /* Erros lexicos */
 .                          {
                               lex_error(yytext, yylineno, yycolumn);
                               yycolumn += yyleng;
