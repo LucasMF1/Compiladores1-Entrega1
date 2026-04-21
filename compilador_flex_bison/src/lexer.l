@@ -145,6 +145,28 @@ ws         [ \t\f\r]+
 
 %%
 
+// Comentário de linha
+"//"[^\n]*                 { yycolumn += yyleng; }
+
+// Comentário de bloco
+"/*"                       { yycolumn += yyleng; BEGIN(COMMENT); }
+
+<COMMENT>"*/"              { yycolumn += yyleng; BEGIN(INITIAL); }
+<COMMENT>\n                { yycolumn = 1; }
+<COMMENT>.                 { yycolumn += yyleng; }
+<COMMENT><<EOF>>           {
+                              lex_error("comentário de bloco não finalizado", yylineno, yycolumn);
+                              return 0;
+                           }
+
+// Espaços e tabulações
+{ws}                       { yycolumn += yyleng; }
+
+// Quebra de linha
+\n                         { yycolumn = 1; }
+
+
+
  /* -------------------------------------------------------------------------
   * Regras do analisador lexico
   *
