@@ -13,10 +13,12 @@ type Caso = {
 };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pastaTestes = resolve(__dirname, "../../..", "testes");
+const pastaTestes = resolve(__dirname, "../../..", "testes_js_to_python");
 const casesPath = resolve(pastaTestes, "cases.json");
 
-const casos: Caso[] = JSON.parse(readFileSync(casesPath, "utf-8"));
+const casos: Caso[] = JSON.parse(readFileSync(casesPath, "utf-8")).filter(
+  (caso: Caso) => caso.input.startsWith("lexer/"),
+);
 
 let aprovados = 0;
 let reprovados = 0;
