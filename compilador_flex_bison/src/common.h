@@ -27,10 +27,11 @@
 #include "symbol_table.h"
 
 /* Variaveis fornecidas pelo Flex/Bison. */
-extern int   yylineno;
-extern int   yycolumn;
-extern char *yytext;
-extern FILE *yyin;
+extern int          yylineno;
+extern int          yycolumn;
+extern unsigned long yyleng;   /* yy_size_t no flex */
+extern char        *yytext;
+extern FILE        *yyin;
 
 /* Funcoes geradas pelo Flex/Bison. */
 int  yylex(void);
@@ -39,5 +40,8 @@ int  yyparse(void);
 /* Tratamento de erros - implementadas em parser.y. */
 void yyerror(const char *msg);
 void lex_error(const char *lexeme, int line, int column);
+
+/* Contador de erros lexicos - definido em parser.y, usado pelo modo --lex. */
+extern int lex_error_count;
 
 #endif /* COMPILADOR_COMMON_H */

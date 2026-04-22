@@ -18,6 +18,7 @@ set -uo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BIN="$ROOT_DIR/build/compilador"
 TESTES_DIR="$ROOT_DIR/../testes_js_to_python"
+OUT_DIR="$ROOT_DIR/build/test_output"
 
 # -----------------------------------------------------------------------------
 # Uso:
@@ -86,18 +87,38 @@ print_stderr () {
 run_case () {
     local arquivo="$1"
     local esperado="$2"  # "valid" ou "invalid"
-    local nome status stderr_output rc
+    local categoria="$3" # "validos" ou "invalidos"
+    local nome status stderr_output rc out_subdir stdout_file stderr_file status_file
     nome="$(basename "$arquivo")"
 
-    # Captura stderr sem mostrar stdout; $? reflete o codigo de saida do binario.
-    stderr_output="$("$BIN" "$arquivo" 2>&1 >/dev/null)"
+    out_subdir="$OUT_DIR${PHASE:+/$PHASE}/$categoria"
+    mkdir -p "$out_subdir"
+    stdout_file="$out_subdir/$nome.stdout"
+    stderr_file="$out_subdir/$nome.stderr"
+    status_file="$out_subdir/$nome.status"
+
+    # Executa capturando stdout e stderr em arquivos separados para debug.
+    # Na fase "lexer", roda em modo --lex para imprimir os tokens em stdout.
+    if [ "$PHASE" = "lexer" ]; then
+        "$BIN" --lex "$arquivo" >"$stdout_file" 2>"$stderr_file"
+    else
+        "$BIN" "$arquivo" >"$stdout_file" 2>"$stderr_file"
+    fi
     rc=$?
+    stderr_output="$(cat "$stderr_file")"
 
     if [ $rc -eq 0 ]; then
         status="valid"
     else
         status="invalid"
     fi
+
+    {
+        echo "arquivo: $arquivo"
+        echo "esperado: $esperado"
+        echo "obtido: $status"
+        echo "exit_code: $rc"
+    } >"$status_file"
 
     printf "  %-60s " "$nome"
     if [ "$status" = "$esperado" ]; then
@@ -113,17 +134,20 @@ run_case () {
     fi
 }
 
+# Limpa saidas anteriores desta fase para nao confundir o debug.
+rm -rf "$OUT_DIR${PHASE:+/$PHASE}"
+
 echo "== Casos validos${PHASE:+ ($PHASE)} =="
 for arq in "$CASES_DIR"/validos/*.js; do
     [ -e "$arq" ] || continue
-    run_case "$arq" valid
+    run_case "$arq" valid validos
 done
 
 if [ -d "$CASES_DIR/invalidos" ]; then
     echo "== Casos invalidos${PHASE:+ ($PHASE)} =="
     for arq in "$CASES_DIR"/invalidos/*.js; do
         [ -e "$arq" ] || continue
-        run_case "$arq" invalid
+        run_case "$arq" invalid invalidos
     done
 fi
 
@@ -131,4 +155,5 @@ echo
 echo "== Resumo =="
 echo "  Passou: $PASS"
 echo "  Falhou: $FAIL"
+echo "  Saidas em: $OUT_DIR${PHASE:+/$PHASE}"
 [ "$FAIL" -eq 0 ]

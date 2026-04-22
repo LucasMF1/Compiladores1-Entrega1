@@ -247,7 +247,10 @@ void yyerror(const char *msg) {
  * Reporta tokens nao reconhecidos pelo lexer. Chamado a partir de lexer.l
  * quando nenhuma regra casa com a entrada.
  */
+int lex_error_count = 0;
+
 void lex_error(const char *lexeme, int line, int column) {
+    lex_error_count++;
     fprintf(stderr, "Token invalido \"%s\" na linha %d, coluna %d\n",
             lexeme, line, column);
 }
