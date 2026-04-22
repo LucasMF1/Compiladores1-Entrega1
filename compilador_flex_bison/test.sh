@@ -57,19 +57,17 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-# Mensagens caso o binario ainda nao exista.
+# Compila antes de testar. Se build.sh falhar, ele proprio exibe instrucoes
+# de instalacao de flex/bison/cc.
 # -----------------------------------------------------------------------------
-if [ ! -x "$BIN" ]; then
-    cat <<EOF
-Binario nao encontrado em:
-  $BIN
+echo "== Build =="
+"$ROOT_DIR/build.sh" || exit $?
 
-Rode ./build.sh primeiro. Se a compilacao falhar por falta de flex/bison,
-o proprio build.sh mostra as instrucoes de instalacao para macOS, Linux e
-Windows.
-EOF
+if [ ! -x "$BIN" ]; then
+    echo "Build reportou sucesso mas binario nao existe em: $BIN" >&2
     exit 1
 fi
+echo
 
 PASS=0
 FAIL=0
