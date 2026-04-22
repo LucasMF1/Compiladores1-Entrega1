@@ -70,8 +70,8 @@ static const char *token_name(int tok) {
     return "UNKNOWN";
 }
 
-static void print_escaped(const char *s, unsigned long len) {
-    unsigned long i;
+static void print_escaped(const char *s, size_t len) {
+    size_t i;
     for (i = 0; i < len; ++i) {
         unsigned char c = (unsigned char)s[i];
         switch (c) {
@@ -88,7 +88,7 @@ static int run_lex_only(void) {
     int tok;
     while ((tok = yylex()) != 0) {
         printf("%s(", token_name(tok));
-        print_escaped(yytext, yyleng);
+        print_escaped(yytext, strlen(yytext));
         printf(") @ %d:%d\n", yylloc.first_line, yylloc.first_column);
     }
     return lex_error_count > 0 ? 1 : 0;

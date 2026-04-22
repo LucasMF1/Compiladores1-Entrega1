@@ -107,7 +107,7 @@ echo "[2/3] Gerando lexer com Flex..."
 "$FLEX" -o "$BUILD_DIR/lexer.yy.c" "$SRC_DIR/lexer.l"
 
 echo "[3/3] Compilando executavel..."
-"$CC" -std=c11 -Wall -Wno-unused-function \
+"$CC" -std=c11 -D_POSIX_C_SOURCE=200809L -Wall -Wno-unused-function \
     -I"$SRC_DIR" -I"$BUILD_DIR" \
     "$BUILD_DIR/parser.tab.c" \
     "$BUILD_DIR/lexer.yy.c"   \

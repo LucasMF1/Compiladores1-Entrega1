@@ -27,11 +27,10 @@
 #include "symbol_table.h"
 
 /* Variaveis fornecidas pelo Flex/Bison. */
-extern int          yylineno;
-extern int          yycolumn;
-extern unsigned long yyleng;   /* yy_size_t no flex */
-extern char        *yytext;
-extern FILE        *yyin;
+extern int   yylineno;
+extern int   yycolumn;
+extern char *yytext;
+extern FILE *yyin;
 
 /* Funcoes geradas pelo Flex/Bison. */
 int  yylex(void);
