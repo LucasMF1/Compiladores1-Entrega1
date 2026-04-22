@@ -20,6 +20,32 @@ BIN="$ROOT_DIR/build/compilador"
 TESTES_DIR="$ROOT_DIR/../testes_js_to_python"
 
 # -----------------------------------------------------------------------------
+# Fase a ser testada: lexer | parser | integracao | "" (raiz).
+# Uso:
+#   ./test.sh            # casos em testes_js_to_python/validos e /invalidos
+#   ./test.sh parser     # casos em testes_js_to_python/parser/validos|invalidos
+#   ./test.sh lexer      # casos em testes_js_to_python/lexer/validos|invalidos
+#   ./test.sh integracao # casos em testes_js_to_python/integracao/validos|invalidos
+# -----------------------------------------------------------------------------
+PHASE="${1:-}"
+if [ -n "$PHASE" ]; then
+    CASES_DIR="$TESTES_DIR/$PHASE"
+    if [ ! -d "$CASES_DIR" ]; then
+        echo "Fase desconhecida: '$PHASE' (diretorio $CASES_DIR nao existe)"
+        echo "Fases disponiveis:"
+        for d in "$TESTES_DIR"/*/; do
+            [ -d "$d" ] || continue
+            name="$(basename "$d")"
+            case "$name" in validos|invalidos) continue ;; esac
+            echo "  - $name"
+        done
+        exit 1
+    fi
+else
+    CASES_DIR="$TESTES_DIR"
+fi
+
+# -----------------------------------------------------------------------------
 # Mensagens caso o binario ainda nao exista.
 # -----------------------------------------------------------------------------
 if [ ! -x "$BIN" ]; then
@@ -50,15 +76,15 @@ run_case () {
     fi
 }
 
-echo "== Casos validos =="
-for arq in "$TESTES_DIR"/validos/*.js; do
+echo "== Casos validos${PHASE:+ ($PHASE)} =="
+for arq in "$CASES_DIR"/validos/*.js; do
     [ -e "$arq" ] || continue
     run_case "$arq" valid
 done
 
-if [ -d "$TESTES_DIR/invalidos" ]; then
-    echo "== Casos invalidos =="
-    for arq in "$TESTES_DIR"/invalidos/*.js; do
+if [ -d "$CASES_DIR/invalidos" ]; then
+    echo "== Casos invalidos${PHASE:+ ($PHASE)} =="
+    for arq in "$CASES_DIR"/invalidos/*.js; do
         [ -e "$arq" ] || continue
         run_case "$arq" invalid
     done
