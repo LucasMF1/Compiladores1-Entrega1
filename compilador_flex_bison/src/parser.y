@@ -97,6 +97,7 @@
 %left  PLUS MINUS
 %left  TIMES DIVIDE MOD
 %right NOT BIT_NOT UMINUS
+%left  DOT LBRACKET LPAREN
 
 %start program
 
@@ -115,11 +116,56 @@ statement
     : var_decl
     | expr_stmt
     | block
+    | if_stmt
+    | while_stmt
+    | for_stmt
+    | return_stmt
+    | break_stmt
+    | continue_stmt
     | SEMI                                      /* statement vazio */
     ;
 
 block
     : LBRACE stmt_list RBRACE
+    ;
+
+if_stmt
+    : IF LPAREN expression RPAREN statement                   { /* TODO AST: if */ }
+    | IF LPAREN expression RPAREN statement ELSE statement    { /* TODO AST: if/else */ }
+    ;
+
+while_stmt
+    : WHILE LPAREN expression RPAREN statement                { /* TODO AST: while */ }
+    ;
+
+for_stmt
+    : FOR LPAREN for_init SEMI expr_opt SEMI expr_opt RPAREN statement   { /* TODO AST: for */ }
+    ;
+
+for_init
+    : /* vazio */
+    | LET   IDENTIFIER ASSIGN expression                      { free($2); }
+    | CONST IDENTIFIER ASSIGN expression                      { free($2); }
+    | VAR   IDENTIFIER ASSIGN expression                      { free($2); }
+    | expression
+    ;
+
+expr_opt
+    : /* vazio */
+    | expression
+    ;
+
+return_stmt
+    : RETURN SEMI                                             { /* TODO AST: return */ }
+    | RETURN expression SEMI                                  { /* TODO AST: return expr */ }
+    ;
+
+break_stmt
+    : BREAK SEMI                                              { /* TODO AST: break */ }
+    ;
+
+continue_stmt
+    : CONTINUE SEMI                                           { /* TODO AST: continue */ }
     ;
 
 var_decl
@@ -152,8 +198,26 @@ expression
     | expression OR         expression          { /* TODO AST: || */ }
     | MINUS expression  %prec UMINUS            { /* TODO AST: unario - */ }
     | NOT   expression                          { /* TODO AST: ! */ }
-    | IDENTIFIER ASSIGN expression              { free($1); }
+    | IDENTIFIER ASSIGN        expression       { free($1); }
+    | IDENTIFIER PLUS_ASSIGN   expression       { free($1); }
+    | IDENTIFIER MINUS_ASSIGN  expression       { free($1); }
+    | IDENTIFIER TIMES_ASSIGN  expression       { free($1); }
+    | IDENTIFIER DIV_ASSIGN    expression       { free($1); }
+    | IDENTIFIER MOD_ASSIGN    expression       { free($1); }
+    | expression LPAREN arg_list_opt RPAREN     { /* TODO AST: chamada */ }
+    | expression DOT IDENTIFIER                 { free($3); /* TODO AST: acesso */ }
+    | expression LBRACKET expression RBRACKET   { /* TODO AST: index */ }
     | primary
+    ;
+
+arg_list_opt
+    : /* vazio */
+    | arg_list
+    ;
+
+arg_list
+    : expression
+    | arg_list COMMA expression
     ;
 
 primary
