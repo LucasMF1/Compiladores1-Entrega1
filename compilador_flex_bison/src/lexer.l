@@ -116,13 +116,13 @@ static char *copy_without_quotes(const char *text, size_t len) {
 
 /* Preenche yylloc (usado por yyerror via %locations) antes da acao do token.
  * Disparado por Flex para toda regra casada; as regras que nao retornam
- * (espacos, comentarios) apenas sobrescrevem valores que nao serao lidos. */
+ * (espacos, comentarios) apenas sobrescrevem valores que nao serao lidos. 
 #define YY_USER_ACTION                                  \
     yylloc.first_line   = yylineno;                     \
     yylloc.first_column = yycolumn;                     \
     yylloc.last_line    = yylineno;                     \
     yylloc.last_column  = yycolumn + yyleng - 1;
-
+*/
 extern void lex_error(const char *lexeme, int line, int column);
 %}
 
