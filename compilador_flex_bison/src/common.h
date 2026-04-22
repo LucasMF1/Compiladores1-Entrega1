@@ -18,10 +18,13 @@
 
 #ifndef COMPILADOR_COMMON_H
 #define COMPILADOR_COMMON_H
+#define TABLE_SIZE 101
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "symbol_table.h"
 
 /* Variaveis fornecidas pelo Flex/Bison. */
 extern int   yylineno;

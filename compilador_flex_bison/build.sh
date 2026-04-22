@@ -112,6 +112,7 @@ echo "[3/3] Compilando executavel..."
     "$BUILD_DIR/parser.tab.c" \
     "$BUILD_DIR/lexer.yy.c"   \
     "$SRC_DIR/main.c"         \
+    "$SRC_DIR/symbol_table.c"      \
     -o "$BUILD_DIR/compilador"
 
 echo "OK -> $BUILD_DIR/compilador"
