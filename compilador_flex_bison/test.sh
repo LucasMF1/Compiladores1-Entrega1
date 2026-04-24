@@ -87,6 +87,7 @@ run_case () {
     local esperado="$2"  # "valid" ou "invalid"
     local categoria="$3" # "validos" ou "invalidos"
     local nome status stderr_output rc out_subdir stdout_file stderr_file status_file
+    local expected_err_file expected_err mismatch
     nome="$(basename "$arquivo")"
 
     out_subdir="$OUT_DIR${PHASE:+/$PHASE}/$categoria"
@@ -94,6 +95,7 @@ run_case () {
     stdout_file="$out_subdir/$nome.stdout"
     stderr_file="$out_subdir/$nome.stderr"
     status_file="$out_subdir/$nome.status"
+    expected_err_file="${arquivo%.js}.err"
 
     # Executa capturando stdout e stderr em arquivos separados para debug.
     # Na fase "lexer", roda em modo --lex para imprimir os tokens em stdout.
@@ -118,15 +120,25 @@ run_case () {
         echo "exit_code: $rc"
     } >"$status_file"
 
+    mismatch=""
+    if [ "$status" != "$esperado" ]; then
+        mismatch="esperado $esperado, obtido $status"
+    elif [ "$PHASE" = "parser" ] && [ -f "$expected_err_file" ]; then
+        expected_err="$(cat "$expected_err_file")"
+        if ! grep -Fq -- "$expected_err" "$stderr_file"; then
+            mismatch="stderr nao contem o trecho esperado de $(basename "$expected_err_file")"
+        fi
+    fi
+
     printf "  %-60s " "$nome"
-    if [ "$status" = "$esperado" ]; then
+    if [ -z "$mismatch" ]; then
         echo "OK ($status)"
         PASS=$((PASS + 1))
         if [ "$VERBOSE" = "1" ]; then
             print_stderr "$stderr_output"
         fi
     else
-        echo "FALHOU (esperado $esperado, obtido $status)"
+        echo "FALHOU ($mismatch)"
         FAIL=$((FAIL + 1))
         print_stderr "$stderr_output"
     fi

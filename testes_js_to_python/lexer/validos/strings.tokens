@@ -1,15 +1,7 @@
-STRING(Hello, world!) @ 1:1
-NEWLINE(\n) @ 1:16
-STRING(Hello, world!) @ 2:1
-NEWLINE(\n) @ 2:16
-STRING(This is a string with a newline character:\n) @ 3:1
-NEWLINE(\n) @ 3:47
-STRING(This is a string with a tab character:\t) @ 4:1
-NEWLINE(\n) @ 4:43
-STRING(This is a string with a backslash: \\) @ 5:1
-NEWLINE(\n) @ 5:40
-STRING(This is a string with a Unicode character: \u263A) @ 6:1
-NEWLINE(\n) @ 6:52
-STRING(This is a string with an emoji: 😀) @ 7:1
-NEWLINE(\n) @ 7:37
-EOF() @ 8:1
+STRING('Hello, world!') @ 2:1
+STRING("Hello, world!") @ 3:1
+STRING('This is a string with a newline character:\\n') @ 6:1
+STRING("This is a string with a tab character:\\t") @ 7:1
+STRING('This is a string with a backslash: \\\\') @ 8:1
+STRING("This is a string with a Unicode character: \\u263A") @ 11:1
+STRING('This is a string with an emoji: 😀') @ 12:1

@@ -75,16 +75,57 @@
     "input": "parser/validos/expressoes.js"
   },
   {
+    "id": "parser_controle_fluxo",
+    "description": "Estruturas if/else, while e for com blocos e atribuicoes compostas devem ser aceitas pelo parser.",
+    "validity": "valid",
+    "input": "parser/validos/controle_fluxo.js"
+  },
+  {
+    "id": "parser_encadeamento_precedencia",
+    "description": "Chamadas, acessos por ponto e indice, negacao e precedencia entre operadores devem ser aceitos pelo parser.",
+    "validity": "valid",
+    "input": "parser/validos/encadeamento_e_precedencia.js"
+  },
+  {
+    "id": "parser_fluxo_aninhado",
+    "description": "Blocos aninhados com break, continue e return devem ser aceitos pelo parser.",
+    "validity": "valid",
+    "input": "parser/validos/fluxo_aninhado.js"
+  },
+  {
     "id": "parser_expressao_invalida",
     "description": "Expressao com operador binario sem operando direito deve causar erro sintatico.",
     "validity": "invalid",
-    "input": "parser/invalidos/expressao_invalida.js"
+    "input": "parser/invalidos/expressao_invalida.js",
+    "expectedError": "parser/invalidos/expressao_invalida.err"
   },
   {
     "id": "parser_let_sem_identificador",
     "description": "Declaracao let sem identificador a seguir deve causar erro sintatico.",
     "validity": "invalid",
-    "input": "parser/invalidos/let_sem_identificador.js"
+    "input": "parser/invalidos/let_sem_identificador.js",
+    "expectedError": "parser/invalidos/let_sem_identificador.err"
+  },
+  {
+    "id": "parser_acesso_incompleto",
+    "description": "Acesso por ponto sem identificador apos o operador deve causar erro sintatico.",
+    "validity": "invalid",
+    "input": "parser/invalidos/acesso_incompleto.js",
+    "expectedError": "parser/invalidos/acesso_incompleto.err"
+  },
+  {
+    "id": "parser_bloco_sem_fechamento",
+    "description": "Bloco aberto sem chave de fechamento deve causar erro sintatico no fim do arquivo.",
+    "validity": "invalid",
+    "input": "parser/invalidos/bloco_sem_fechamento.js",
+    "expectedError": "parser/invalidos/bloco_sem_fechamento.err"
+  },
+  {
+    "id": "parser_for_sem_ponto_virgula",
+    "description": "Cabecalho de for sem o primeiro ponto e virgula deve causar erro sintatico.",
+    "validity": "invalid",
+    "input": "parser/invalidos/for_sem_ponto_virgula.js",
+    "expectedError": "parser/invalidos/for_sem_ponto_virgula.err"
   },
   {
     "id": "integracao_programa_simples",
