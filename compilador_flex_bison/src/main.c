@@ -95,17 +95,20 @@ static int run_lex_only(void) {
 }
 
 static void usage(const char *prog) {
-    fprintf(stderr, "Uso: %s [--lex] <arquivo.js>\n", prog);
+    fprintf(stderr, "Uso: %s [--lex|--ast] <arquivo.js>\n", prog);
 }
 
 int main(int argc, char **argv) {
     int         lex_only = 0;
+    int         dump_ast = 0;
     const char *path     = NULL;
     int         i;
 
     for (i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--lex") == 0 || strcmp(argv[i], "-l") == 0) {
             lex_only = 1;
+        } else if (strcmp(argv[i], "--ast") == 0 || strcmp(argv[i], "-a") == 0) {
+            dump_ast = 1;
         } else if (argv[i][0] == '-') {
             fprintf(stderr, "Flag desconhecida: %s\n", argv[i]);
             usage(argv[0]);
@@ -133,10 +136,17 @@ int main(int argc, char **argv) {
     int rc = lex_only ? run_lex_only() : yyparse();
     fclose(yyin);
 
+    if (!lex_only && rc == 0 && dump_ast && ast_root) {
+        ast_print(ast_root, stdout);
+    }
+
     /*
      * TODO: se rc == 0 e nao for modo --lex, chamar a rotina de geracao de
      *       codigo Python a partir da AST construida durante o parsing.
      */
+
+    ast_free(ast_root);
+    ast_root = NULL;
 
     return rc;
 }
