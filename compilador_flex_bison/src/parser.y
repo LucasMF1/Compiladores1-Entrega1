@@ -15,6 +15,7 @@
 
 %{
 #include "common.h"
+SymbolTable symtab;
 %}
 
 %locations
@@ -127,9 +128,9 @@ for_stmt
 
 for_init
     : /* vazio */                                             { $$ = NULL; }
-    | LET   IDENTIFIER ASSIGN expression                      { $$ = ast_var_decl(LET,   $2, $4, @$.first_line, @$.first_column); }
-    | CONST IDENTIFIER ASSIGN expression                      { $$ = ast_var_decl(CONST, $2, $4, @$.first_line, @$.first_column); }
-    | VAR   IDENTIFIER ASSIGN expression                      { $$ = ast_var_decl(VAR,   $2, $4, @$.first_line, @$.first_column); }
+    | LET   IDENTIFIER ASSIGN expression                      { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(LET,   $2, $4, @$.first_line, @$.first_column); }
+    | CONST IDENTIFIER ASSIGN expression                      { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(CONST, $2, $4, @$.first_line, @$.first_column); }
+    | VAR   IDENTIFIER ASSIGN expression                      { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, $4, @$.first_line, @$.first_column); }
     | expression                                              { $$ = $1; }
     ;
 
@@ -152,11 +153,11 @@ continue_stmt
     ;
 
 var_decl
-    : LET   IDENTIFIER ASSIGN expression SEMI   { $$ = ast_var_decl(LET,   $2, $4,   @$.first_line, @$.first_column); }
-    | CONST IDENTIFIER ASSIGN expression SEMI   { $$ = ast_var_decl(CONST, $2, $4,   @$.first_line, @$.first_column); }
-    | VAR   IDENTIFIER ASSIGN expression SEMI   { $$ = ast_var_decl(VAR,   $2, $4,   @$.first_line, @$.first_column); }
-    | LET   IDENTIFIER SEMI                     { $$ = ast_var_decl(LET,   $2, NULL, @$.first_line, @$.first_column); }
-    | VAR   IDENTIFIER SEMI                     { $$ = ast_var_decl(VAR,   $2, NULL, @$.first_line, @$.first_column); }
+    : LET   IDENTIFIER ASSIGN expression SEMI   { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(LET,   $2, $4,   @$.first_line, @$.first_column); }
+    | CONST IDENTIFIER ASSIGN expression SEMI   { sym_insert(&symtab, $2, CAT_CONST); $$ = ast_var_decl(CONST, $2, $4,   @$.first_line, @$.first_column); }
+    | VAR   IDENTIFIER ASSIGN expression SEMI   { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, $4,   @$.first_line, @$.first_column); }
+    | LET   IDENTIFIER SEMI                     { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(LET,   $2, NULL, @$.first_line, @$.first_column); }
+    | VAR   IDENTIFIER SEMI                     { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, NULL, @$.first_line, @$.first_column); }
     ;
 
 expr_stmt
@@ -204,7 +205,7 @@ arg_list
     ;
 
 primary
-    : IDENTIFIER                                { $$ = ast_ident($1, @$.first_line, @$.first_column); }
+    : IDENTIFIER                                { if (sym_lookup(&symtab, $1) == NULL) {printf("Erro: variavel '%s' nao declarada\n", $1);} $$ = ast_ident($1, @$.first_line, @$.first_column); }
     | NUMBER                                    { $$ = ast_number($1, @$.first_line, @$.first_column); }
     | STRING                                    { $$ = ast_string($1, @$.first_line, @$.first_column); }
     | TRUE_TOK                                  { $$ = ast_bool(1, @$.first_line, @$.first_column); }

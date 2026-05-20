@@ -21,6 +21,7 @@
 
 #include "common.h"
 #include "parser.tab.h"
+extern SymbolTable symtab;
 
 typedef struct {
     int         token;
@@ -103,6 +104,10 @@ int main(int argc, char **argv) {
     int         dump_ast = 0;
     const char *path     = NULL;
     int         i;
+
+    //init tabela de simbolos
+    sym_init(&symtab);
+
 
     for (i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--lex") == 0 || strcmp(argv[i], "-l") == 0) {
