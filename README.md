@@ -146,8 +146,9 @@ Utilize os arquivos da pasta `testes_js_to_python/`:
 | Analisador Léxico (`lexer.l`) |  Implementado |
 | Analisador Sintático (`parser.y`) |  Implementado |
 | Tabela de Símbolos | Implementado  |
-| AST (Árvore Sintática Abstrata) | 📋 Planejado |
-| Geração de Código Python | 📋 Planejado |
+| AST (Árvore Sintática Abstrata) | Em Progresso |
+| Geração de Código Python | Em progresso |
+| Otimização de código | 📋 Planejado |
 | Testes de Integração | 📋 Planejado |
 
 
