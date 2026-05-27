@@ -43,5 +43,6 @@ void lex_error(const char *lexeme, int line, int column);
 
 /* Contador de erros lexicos - definido em parser.y, usado pelo modo --lex. */
 extern int lex_error_count;
+extern int semantic_error_count;
 
 #endif /* COMPILADOR_COMMON_H */

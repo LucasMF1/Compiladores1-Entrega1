@@ -139,6 +139,7 @@ int main(int argc, char **argv) {
     }
 
     int rc = lex_only ? run_lex_only() : yyparse();
+    if (!lex_only && semantic_error_count > 0) rc = 1;
     fclose(yyin);
 
     if (!lex_only && rc == 0 && dump_ast && ast_root) {

@@ -27,7 +27,7 @@ static unsigned hash(const char *str) {
 void sym_insert(SymbolTable *t, const char *name, SymbolCategory cat) {
 
     if (sym_lookup(t, name) != NULL) {
-    printf("Erro: simbolo '%s' ja declarado\n", name);
+    printf("Erro: simbolo '%s' ja declaredo\n", name);
     return;
 }
 
@@ -35,7 +35,7 @@ void sym_insert(SymbolTable *t, const char *name, SymbolCategory cat) {
 
     Symbol *sym = malloc(sizeof(Symbol));
     if (!sym) {
-        fprintf(stderr, "Erro de memoria ao inserir simbolo.\n");
+        fprintf(stderr, "Erro de memoria ao alocar simbolo\n");
         exit(1);
     }
 
@@ -53,7 +53,7 @@ void sym_insert(SymbolTable *t, const char *name, SymbolCategory cat) {
     /* Agora o bucket aponta para o novo símbolo */
     t->buckets[index] = sym;
 
-    printf("Inserido simbolo '%s' no bucket %u\n", name, index);
+    printf("Inserindo simbolo '%s' no bucket %u\n", name, index);
 }
 
 Symbol *sym_lookup(SymbolTable *t, const char *name) {

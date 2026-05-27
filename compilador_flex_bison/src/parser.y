@@ -16,6 +16,8 @@
 %{
 #include "common.h"
 SymbolTable symtab;
+
+void semantic_error(const char *msg, const char *symbol, int line, int column);
 %}
 
 %locations
@@ -63,6 +65,7 @@ SymbolTable symtab;
 %type <node> program stmt_list statement block
 %type <node> if_stmt while_stmt for_stmt return_stmt break_stmt continue_stmt
 %type <node> var_decl expr_stmt
+//falta fazer funcao %type <node> function_decl param_list param_list_opt
 %type <node> for_init expr_opt
 %type <node> expression primary
 %type <node> arg_list_opt arg_list
@@ -99,6 +102,7 @@ statement
     : var_decl                                  { $$ = $1; }
     | expr_stmt                                 { $$ = $1; }
     | block                                     { $$ = $1; }
+//    | function_decl                             { $$ = $1; }
     | if_stmt                                   { $$ = $1; }
     | while_stmt                                { $$ = $1; }
     | for_stmt                                  { $$ = $1; }
@@ -152,6 +156,10 @@ continue_stmt
     : CONTINUE SEMI                                           { $$ = ast_continue(@$.first_line, @$.first_column); }
     ;
 
+//function_decl
+//    : FUNCTION IDENTIFIER LPAREN param_list_opt RPAREN block  { $$ = ast_function(@$.first_line, @$.first_column);}
+//    ;
+
 var_decl
     : LET   IDENTIFIER ASSIGN expression SEMI   { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(LET,   $2, $4,   @$.first_line, @$.first_column); }
     | CONST IDENTIFIER ASSIGN expression SEMI   { sym_insert(&symtab, $2, CAT_CONST); $$ = ast_var_decl(CONST, $2, $4,   @$.first_line, @$.first_column); }
@@ -182,12 +190,12 @@ expression
     | expression OR         expression          { $$ = ast_binary(OR,         $1, $3, @$.first_line, @$.first_column); }
     | MINUS expression  %prec UMINUS            { $$ = ast_unary(MINUS, $2, @$.first_line, @$.first_column); }
     | NOT   expression                          { $$ = ast_unary(NOT,   $2, @$.first_line, @$.first_column); }
-    | IDENTIFIER ASSIGN        expression       { $$ = ast_assign(ASSIGN,        $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER PLUS_ASSIGN   expression       { $$ = ast_assign(PLUS_ASSIGN,   $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER MINUS_ASSIGN  expression       { $$ = ast_assign(MINUS_ASSIGN,  $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER TIMES_ASSIGN  expression       { $$ = ast_assign(TIMES_ASSIGN,  $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER DIV_ASSIGN    expression       { $$ = ast_assign(DIV_ASSIGN,    $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER MOD_ASSIGN    expression       { $$ = ast_assign(MOD_ASSIGN,    $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER ASSIGN        expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER PLUS_ASSIGN   expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(PLUS_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER MINUS_ASSIGN  expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(MINUS_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER TIMES_ASSIGN  expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(TIMES_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER DIV_ASSIGN    expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(DIV_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER MOD_ASSIGN    expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(MOD_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
     | expression LPAREN arg_list_opt RPAREN     { $$ = ast_call($1, $3, @$.first_line, @$.first_column); }
     | expression DOT IDENTIFIER                 { $$ = ast_member($1, $3, @$.first_line, @$.first_column); }
     | expression LBRACKET expression RBRACKET   { $$ = ast_index($1, $3,  @$.first_line, @$.first_column); }
@@ -205,7 +213,7 @@ arg_list
     ;
 
 primary
-    : IDENTIFIER                                { if (sym_lookup(&symtab, $1) == NULL) {printf("Erro: variavel '%s' nao declarada\n", $1);} $$ = ast_ident($1, @$.first_line, @$.first_column); }
+    : IDENTIFIER                                { if (sym_lookup(&symtab, $1) == NULL) {printf("Error: variable '%s' not declared.\n", $1);} $$ = ast_ident($1, @$.first_line, @$.first_column); }
     | NUMBER                                    { $$ = ast_number($1, @$.first_line, @$.first_column); }
     | STRING                                    { $$ = ast_string($1, @$.first_line, @$.first_column); }
     | TRUE_TOK                                  { $$ = ast_bool(1, @$.first_line, @$.first_column); }
@@ -228,4 +236,13 @@ void lex_error(const char *lexeme, int line, int column) {
     lex_error_count++;
     fprintf(stderr, "Token invalido \"%s\" na linha %d, coluna %d\n",
             lexeme, line, column);
+}
+
+int semantic_error_count = 0;
+
+void semantic_error(const char *msg, const char *symbol, int line, int column) {
+    semantic_error_count++;
+    fprintf(stderr, "Erro semantico: ");
+    fprintf(stderr, msg, symbol);
+    fprintf(stderr, " na linha %d, coluna %d\n", line, column);
 }
