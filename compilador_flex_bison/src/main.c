@@ -106,8 +106,8 @@ int main(int argc, char **argv) {
     int         i;
 
     //init tabela de simbolos
-    sym_init(&symtab);
-
+    //sym_init(&symtab);
+    scope_enter();
 
     for (i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--lex") == 0 || strcmp(argv[i], "-l") == 0) {
@@ -154,5 +154,6 @@ int main(int argc, char **argv) {
     ast_free(ast_root);
     ast_root = NULL;
 
+    scope_exit();
     return rc;
 }

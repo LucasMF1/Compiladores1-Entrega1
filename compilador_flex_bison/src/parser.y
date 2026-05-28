@@ -113,7 +113,7 @@ statement
     ;
 
 block
-    : LBRACE stmt_list RBRACE                   { $$ = ast_block($2, @$.first_line, @$.first_column); }
+    : LBRACE {scope_enter();} stmt_list RBRACE                   { $$ = ast_block($3, @$.first_line, @$.first_column); scope_exit();}
     ;
 
 if_stmt
@@ -132,9 +132,9 @@ for_stmt
 
 for_init
     : /* vazio */                                             { $$ = NULL; }
-    | LET   IDENTIFIER ASSIGN expression                      { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(LET,   $2, $4, @$.first_line, @$.first_column); }
-    | CONST IDENTIFIER ASSIGN expression                      { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(CONST, $2, $4, @$.first_line, @$.first_column); }
-    | VAR   IDENTIFIER ASSIGN expression                      { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, $4, @$.first_line, @$.first_column); }
+    | LET   IDENTIFIER ASSIGN expression                      { scope_insert($2, CAT_VAR); $$ = ast_var_decl(LET,   $2, $4, @$.first_line, @$.first_column); }
+    | CONST IDENTIFIER ASSIGN expression                      { scope_insert($2, CAT_CONST); $$ = ast_var_decl(CONST, $2, $4, @$.first_line, @$.first_column); }
+    | VAR   IDENTIFIER ASSIGN expression                      { scope_insert($2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, $4, @$.first_line, @$.first_column); }
     | expression                                              { $$ = $1; }
     ;
 
@@ -161,11 +161,11 @@ continue_stmt
 //    ;
 
 var_decl
-    : LET   IDENTIFIER ASSIGN expression SEMI   { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(LET,   $2, $4,   @$.first_line, @$.first_column); }
-    | CONST IDENTIFIER ASSIGN expression SEMI   { sym_insert(&symtab, $2, CAT_CONST); $$ = ast_var_decl(CONST, $2, $4,   @$.first_line, @$.first_column); }
-    | VAR   IDENTIFIER ASSIGN expression SEMI   { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, $4,   @$.first_line, @$.first_column); }
-    | LET   IDENTIFIER SEMI                     { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(LET,   $2, NULL, @$.first_line, @$.first_column); }
-    | VAR   IDENTIFIER SEMI                     { sym_insert(&symtab, $2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, NULL, @$.first_line, @$.first_column); }
+    : LET   IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_VAR); $$ = ast_var_decl(LET,   $2, $4,   @$.first_line, @$.first_column); }
+    | CONST IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_CONST); $$ = ast_var_decl(CONST, $2, $4,   @$.first_line, @$.first_column); }
+    | VAR   IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, $4,   @$.first_line, @$.first_column); }
+    | LET   IDENTIFIER SEMI                     { scope_insert($2, CAT_VAR); $$ = ast_var_decl(LET,   $2, NULL, @$.first_line, @$.first_column); }
+    | VAR   IDENTIFIER SEMI                     { scope_insert($2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, NULL, @$.first_line, @$.first_column); }
     ;
 
 expr_stmt
@@ -190,12 +190,12 @@ expression
     | expression OR         expression          { $$ = ast_binary(OR,         $1, $3, @$.first_line, @$.first_column); }
     | MINUS expression  %prec UMINUS            { $$ = ast_unary(MINUS, $2, @$.first_line, @$.first_column); }
     | NOT   expression                          { $$ = ast_unary(NOT,   $2, @$.first_line, @$.first_column); }
-    | IDENTIFIER ASSIGN        expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(ASSIGN, $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER PLUS_ASSIGN   expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(PLUS_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER MINUS_ASSIGN  expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(MINUS_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER TIMES_ASSIGN  expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(TIMES_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER DIV_ASSIGN    expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(DIV_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER MOD_ASSIGN    expression       { if (sym_lookup(&symtab, $1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(MOD_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER ASSIGN        expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER PLUS_ASSIGN   expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(PLUS_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER MINUS_ASSIGN  expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(MINUS_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER TIMES_ASSIGN  expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(TIMES_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER DIV_ASSIGN    expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(DIV_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER MOD_ASSIGN    expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(MOD_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
     | expression LPAREN arg_list_opt RPAREN     { $$ = ast_call($1, $3, @$.first_line, @$.first_column); }
     | expression DOT IDENTIFIER                 { $$ = ast_member($1, $3, @$.first_line, @$.first_column); }
     | expression LBRACKET expression RBRACKET   { $$ = ast_index($1, $3,  @$.first_line, @$.first_column); }
@@ -213,7 +213,7 @@ arg_list
     ;
 
 primary
-    : IDENTIFIER                                { if (sym_lookup(&symtab, $1) == NULL) {printf("Error: variable '%s' not declared.\n", $1);} $$ = ast_ident($1, @$.first_line, @$.first_column); }
+    : IDENTIFIER                                { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_ident($1, @$.first_line, @$.first_column); }
     | NUMBER                                    { $$ = ast_number($1, @$.first_line, @$.first_column); }
     | STRING                                    { $$ = ast_string($1, @$.first_line, @$.first_column); }
     | TRUE_TOK                                  { $$ = ast_bool(1, @$.first_line, @$.first_column); }

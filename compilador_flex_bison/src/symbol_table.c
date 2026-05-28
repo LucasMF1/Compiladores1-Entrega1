@@ -5,7 +5,7 @@
 
 /* Inicialização da tabela */
 void sym_init(SymbolTable *t) {
-    t->current_scope = 0;
+    //t->current_scope = 0;
     for (int i = 0; i < TABLE_SIZE; i++) {
         t->buckets[i] = NULL;
     }
@@ -26,10 +26,6 @@ static unsigned hash(const char *str) {
    
 void sym_insert(SymbolTable *t, const char *name, SymbolCategory cat) {
 
-    if (sym_lookup(t, name) != NULL) {
-    printf("Erro: simbolo '%s' ja declaredo\n", name);
-    return;
-}
 
     unsigned index = hash(name);
 
@@ -44,7 +40,7 @@ void sym_insert(SymbolTable *t, const char *name, SymbolCategory cat) {
 
     /* Valores temporários/default */
     sym->type = TYPE_NONE;
-    sym->scope = t->current_scope;
+    //sym->scope = t->current_scope;
     sym->line = yylineno;
 
     /* Inserção na cabeça da lista */
@@ -53,7 +49,7 @@ void sym_insert(SymbolTable *t, const char *name, SymbolCategory cat) {
     /* Agora o bucket aponta para o novo símbolo */
     t->buckets[index] = sym;
 
-    printf("Inserindo simbolo '%s' no bucket %u\n", name, index);
+    //printf("Inserindo simbolo '%s' no bucket %u\n", name, index);
 }
 
 Symbol *sym_lookup(SymbolTable *t, const char *name) {
@@ -107,5 +103,64 @@ void sym_destroy(SymbolTable *t) {
 
         /* Bucket agora está vazio */
         t->buckets[i] = NULL;
+    }
+}
+
+
+static Scope *current_scope = NULL;
+
+void scope_enter(void) {
+    Scope *scope = malloc(sizeof(Scope));
+
+    sym_init(&scope->table);
+
+    scope->parent = current_scope;
+
+    current_scope = scope;
+}
+
+void scope_insert(const char *name, SymbolCategory category) {
+    if (current_scope == NULL) {
+        return;
+    }
+
+    if (scope_lookup_current(name) != NULL) {
+        semantic_error("variavel ja declarada", name, yylineno, yycolumn);
+        return;
+    }
+
+    sym_insert(&current_scope->table, name, category);
+}
+
+Symbol *scope_lookup(const char *name) {
+    Scope *scope = current_scope;
+
+    while (scope != NULL) {
+        Symbol *sym = sym_lookup(&scope->table, name);
+
+        if (sym != NULL) {
+            return sym;
+        }
+
+        scope = scope->parent;
+    }
+
+    return NULL;
+}
+
+Symbol *scope_lookup_current(const char *name) {
+    if (current_scope == NULL) {
+        return NULL;
+    }
+
+    return sym_lookup(&current_scope->table, name);
+}
+
+void scope_exit(void) {
+    Scope *old = current_scope;
+
+    if (current_scope != NULL) {
+        current_scope = current_scope->parent;
+        free(old);
     }
 }

@@ -125,7 +125,9 @@ run_case () {
         mismatch="esperado $esperado, obtido $status"
     elif [ "$PHASE" = "parser" ] && [ -f "$expected_err_file" ]; then
         expected_err="$(cat "$expected_err_file")"
-        if ! grep -Fq -- "$expected_err" "$stderr_file"; then
+
+        # mudanca aqui de Fq pra Eq pra aceitar regex e as mensagens de erro ficarem mais personalizadas
+        if ! grep -Eq -- "$expected_err" "$stderr_file"; then
             mismatch="stderr nao contem o trecho esperado de $(basename "$expected_err_file")"
         fi
     fi
