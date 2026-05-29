@@ -93,6 +93,12 @@
     "input": "parser/validos/fluxo_aninhado.js"
   },
   {
+    "id": "parser_function",
+    "description": "Declaracao de function com parametros, variavel local e return deve ser aceita pelo parser.",
+    "validity": "valid",
+    "input": "parser/validos/function.js"
+  },
+  {
     "id": "parser_expressao_invalida",
     "description": "Expressao com operador binario sem operando direito deve causar erro sintatico.",
     "validity": "invalid",
@@ -144,5 +150,33 @@
     "description": "Programa lexicamente valido mas sintaticamente incorreto deve falhar na fase de parsing.",
     "validity": "invalid",
     "input": "integracao/invalidos/erro_sintatico.js"
+  },
+  {
+    "id": "ast_declaracoes_e_literais",
+    "description": "A AST deve preservar declaracoes simples e literais primarios como numero, string, bool, null e undefined.",
+    "validity": "valid",
+    "input": "ast/validos/declaracoes_e_literais.js",
+    "expectedOutput": "ast/validos/declaracoes_e_literais.ast"
+  },
+  {
+    "id": "ast_encadeamento_e_precedencia",
+    "description": "A AST deve refletir corretamente encadeamento de chamada, acesso por indice e precedencia entre operadores.",
+    "validity": "valid",
+    "input": "ast/validos/encadeamento_e_precedencia.js",
+    "expectedOutput": "ast/validos/encadeamento_e_precedencia.ast"
+  },
+  {
+    "id": "ast_controle_fluxo",
+    "description": "A AST deve estruturar if/else, while, for, break, continue e return com a hierarquia esperada.",
+    "validity": "valid",
+    "input": "ast/validos/controle_fluxo.js",
+    "expectedOutput": "ast/validos/controle_fluxo.ast"
+  },
+  {
+    "id": "ast_function",
+    "description": "A AST deve representar declaracao de function com lista de parametros, corpo em bloco e chamada subsequente.",
+    "validity": "valid",
+    "input": "ast/validos/function.js",
+    "expectedOutput": "ast/validos/function.ast"
   }
 ]

@@ -123,6 +123,7 @@ gcc -o compilador lex.yy.c parser.tab.c -lfl
 
 ```bash
 bash test.sh
+bash test.sh ast
 ```
 
 ### Testes manuais
@@ -197,4 +198,3 @@ git push origin feat/nome-da-feature
 ## Licença
 
 Este projeto está licenciado sob a licença **MIT**. Consulte o arquivo [LICENSE](./LICENSE) para mais detalhes. 
-

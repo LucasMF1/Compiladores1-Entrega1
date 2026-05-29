@@ -25,6 +25,7 @@ OUT_DIR="$ROOT_DIR/build/test_output"
 #   ./test.sh            # casos em testes_js_to_python/validos e /invalidos
 #   ./test.sh parser     # casos em testes_js_to_python/parser/validos|invalidos
 #   ./test.sh lexer      # casos em testes_js_to_python/lexer/validos|invalidos
+#   ./test.sh ast        # casos em testes_js_to_python/ast/validos (+ .ast esperado)
 #   ./test.sh -v parser  # verbose: mostra stderr tambem em casos OK
 # -----------------------------------------------------------------------------
 VERBOSE=0
@@ -87,7 +88,7 @@ run_case () {
     local esperado="$2"  # "valid" ou "invalid"
     local categoria="$3" # "validos" ou "invalidos"
     local nome status stderr_output rc out_subdir stdout_file stderr_file status_file
-    local expected_err_file expected_err mismatch
+    local expected_err_file expected_ast_file expected_err mismatch
     nome="$(basename "$arquivo")"
 
     out_subdir="$OUT_DIR${PHASE:+/$PHASE}/$categoria"
@@ -96,11 +97,14 @@ run_case () {
     stderr_file="$out_subdir/$nome.stderr"
     status_file="$out_subdir/$nome.status"
     expected_err_file="${arquivo%.js}.err"
+    expected_ast_file="${arquivo%.js}.ast"
 
     # Executa capturando stdout e stderr em arquivos separados para debug.
     # Na fase "lexer", roda em modo --lex para imprimir os tokens em stdout.
     if [ "$PHASE" = "lexer" ]; then
         "$BIN" --lex "$arquivo" >"$stdout_file" 2>"$stderr_file"
+    elif [ "$PHASE" = "ast" ]; then
+        "$BIN" --ast "$arquivo" >"$stdout_file" 2>"$stderr_file"
     else
         "$BIN" "$arquivo" >"$stdout_file" 2>"$stderr_file"
     fi
@@ -127,6 +131,14 @@ run_case () {
         expected_err="$(cat "$expected_err_file")"
         if ! grep -Fq -- "$expected_err" "$stderr_file"; then
             mismatch="stderr nao contem o trecho esperado de $(basename "$expected_err_file")"
+        fi
+    elif [ "$PHASE" = "ast" ] && [ "$esperado" = "valid" ]; then
+        if [ ! -f "$expected_ast_file" ]; then
+            mismatch="arquivo esperado ausente: $(basename "$expected_ast_file")"
+        elif ! diff -u "$expected_ast_file" "$stdout_file" >"$out_subdir/$nome.diff"; then
+            mismatch="AST diferente do esperado ($(basename "$expected_ast_file"))"
+        else
+            rm -f "$out_subdir/$nome.diff"
         fi
     fi
 

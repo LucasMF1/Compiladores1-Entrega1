@@ -13,6 +13,7 @@
  *   Por kind:
  *     PROGRAM, BLOCK, LIST   -> children[]
  *     VAR_DECL               -> sval=nome, decl_kind=LET/CONST/VAR, a=init?
+ *     FUNCTION               -> sval=nome, a=params(list), b=body(block)
  *     IF                     -> a=cond, b=then, c=else?
  *     WHILE                  -> a=cond, b=body
  *     FOR                    -> a=init?, b=cond?, c=update?, d=body
@@ -49,6 +50,7 @@ typedef enum {
     AST_BLOCK,
     AST_LIST,
     AST_VAR_DECL,
+    AST_FUNCTION,
     AST_IF,
     AST_WHILE,
     AST_FOR,
@@ -103,6 +105,7 @@ AstNode *ast_block(AstNode *body, int line, int col);
 AstNode *ast_list(int line, int col);
 
 AstNode *ast_var_decl(int decl_kind, char *name, AstNode *init, int line, int col);
+AstNode *ast_function(char *name, AstNode *params, AstNode *body, int line, int col);
 AstNode *ast_if(AstNode *cond, AstNode *then_s, AstNode *else_s, int line, int col);
 AstNode *ast_while(AstNode *cond, AstNode *body, int line, int col);
 AstNode *ast_for(AstNode *init, AstNode *cond, AstNode *update, AstNode *body, int line, int col);

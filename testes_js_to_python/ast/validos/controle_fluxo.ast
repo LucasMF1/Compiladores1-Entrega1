@@ -1,0 +1,72 @@
+(program
+  (list
+    (if
+      (ident ativo)
+      (block
+        (list
+          (expr-stmt
+            (assign = total
+              (binary +
+                (ident total)
+                (number 1)
+              )
+            )
+          )
+        )
+      )
+      (block
+        (list
+          (expr-stmt
+            (assign = total
+              (number 0)
+            )
+          )
+        )
+      )
+    )
+    (while
+      (bool true)
+      (block
+        (list
+          (if
+            (ident x)
+            (block
+              (list
+                (break)
+              )
+            )
+            (block
+              (list
+                (continue)
+              )
+            )
+          )
+        )
+      )
+    )
+    (for
+      (var-decl let i
+        (number 0)
+      )
+      (binary <
+        (ident i)
+        (number 10)
+      )
+      (assign += i
+        (number 1)
+      )
+      (block
+        (list
+          (expr-stmt
+            (assign += soma
+              (ident i)
+            )
+          )
+        )
+      )
+    )
+    (return
+      (ident valor)
+    )
+  )
+)

@@ -74,6 +74,14 @@ AstNode *ast_var_decl(int decl_kind, char *name, AstNode *init, int line, int co
     return n;
 }
 
+AstNode *ast_function(char *name, AstNode *params, AstNode *body, int line, int col) {
+    AstNode *n = ast_new(AST_FUNCTION, line, col);
+    n->sval = name;   /* posse transferida */
+    n->a    = params;
+    n->b    = body;
+    return n;
+}
+
 AstNode *ast_if(AstNode *cond, AstNode *then_s, AstNode *else_s, int line, int col) {
     AstNode *n = ast_new(AST_IF, line, col);
     n->a = cond; n->b = then_s; n->c = else_s;
@@ -235,6 +243,15 @@ static void print_rec(const AstNode *n, FILE *out, int level) {
         case AST_VAR_DECL:
             fprintf(out, "(var-decl %s %s\n", decl_name(n->decl_kind), n->sval ? n->sval : "?");
             print_rec(n->a, out, level + 1);
+            break;
+        case AST_FUNCTION:
+            fprintf(out, "(function %s\n", n->sval ? n->sval : "?");
+            indent(out, level + 1); fputs("(params\n", out);
+            if (n->a) {
+                for (int i = 0; i < n->a->child_count; ++i) print_rec(n->a->children[i], out, level + 2);
+            }
+            indent(out, level + 1); fputs(")\n", out);
+            print_rec(n->b, out, level + 1);
             break;
         case AST_IF:
             fputs("(if\n", out);
