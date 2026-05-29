@@ -1,3 +1,6 @@
+let x;
+let valor;
+
 // while contendo if/else interno; break e continue também entram aqui.
 while (true) { if (x) { break; } else { continue; } }
 

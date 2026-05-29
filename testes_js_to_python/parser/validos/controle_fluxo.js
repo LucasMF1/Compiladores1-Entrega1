@@ -1,3 +1,10 @@
+let ativo = true;
+let total = 0;
+let indice = 0;
+let limite = 10;
+let soma = 0;
+
+
 // Cobre os statements estruturais principais aceitos pela gramática.
 if (ativo) { total = total + 1; } else { total = 0; }
 

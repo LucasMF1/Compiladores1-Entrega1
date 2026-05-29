@@ -1,3 +1,13 @@
+let x = 10;
+let y = 20;
+let z = 30;
+let a = 1;
+let b = 2;
+let c = 3;
+let f;
+let obj;
+
+
 // Soma binária básica.
 x + y;
 
