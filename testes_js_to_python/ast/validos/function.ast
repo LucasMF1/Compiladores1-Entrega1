@@ -19,6 +19,9 @@
         )
       )
     )
+    (var-decl let resultado
+      (nil)
+    )
     (expr-stmt
       (assign = resultado
         (call

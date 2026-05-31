@@ -3,4 +3,5 @@ function soma(a, b) {
   return total;
 }
 
+let resultado;
 resultado = soma(1, 2);

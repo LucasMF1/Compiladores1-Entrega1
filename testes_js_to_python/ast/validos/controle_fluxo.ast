@@ -1,5 +1,20 @@
 (program
   (list
+    (var-decl let ativo
+      (bool true)
+    )
+    (var-decl let total
+      (number 0)
+    )
+    (var-decl let x
+      (number 1)
+    )
+    (var-decl let soma
+      (number 0)
+    )
+    (var-decl let valor
+      (number 42)
+    )
     (if
       (ident ativo)
       (block
