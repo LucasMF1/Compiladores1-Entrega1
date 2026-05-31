@@ -65,7 +65,6 @@ void semantic_error(const char *msg, const char *symbol, int line, int column);
 %type <node> program stmt_list statement block
 %type <node> function_decl if_stmt while_stmt for_stmt return_stmt break_stmt continue_stmt
 %type <node> var_decl expr_stmt
-//falta fazer funcao %type <node> function_decl param_list param_list_opt
 %type <node> for_init expr_opt
 %type <node> expression primary
 %type <node> arg_list_opt arg_list
@@ -115,8 +114,12 @@ statement
     ;
 
 function_decl
-    : FUNCTION IDENTIFIER LPAREN param_list_opt RPAREN block
-        { $$ = ast_function($2, $4, $6, @$.first_line, @$.first_column); }
+    : FUNCTION IDENTIFIER { scope_insert($2, CAT_FUNC); scope_enter(); } LPAREN param_list_opt RPAREN LBRACE stmt_list RBRACE
+        { 
+            AstNode *body_block = ast_block($8, @7.first_line, @7.first_column);
+            $$ = ast_function($2, $5, body_block, @$.first_line, @$.first_column); 
+            scope_exit(); 
+        }
     ;
 
 block
@@ -225,8 +228,18 @@ param_list_opt
     ;
 
 param_list
-    : IDENTIFIER                                { $$ = ast_list(@$.first_line, @$.first_column); ast_add_child($$, ast_ident($1, @1.first_line, @1.first_column)); }
-    | param_list COMMA IDENTIFIER               { ast_add_child($1, ast_ident($3, @3.first_line, @3.first_column)); $$ = $1; }
+    : IDENTIFIER                                
+        { 
+            scope_insert($1, CAT_VAR);
+            $$ = ast_list(@$.first_line, @$.first_column); 
+            ast_add_child($$, ast_ident($1, @1.first_line, @1.first_column)); 
+        }
+    | param_list COMMA IDENTIFIER               
+        { 
+            scope_insert($3, CAT_VAR);
+            ast_add_child($1, ast_ident($3, @3.first_line, @3.first_column)); 
+            $$ = $1; 
+        }
     ;
 
 primary

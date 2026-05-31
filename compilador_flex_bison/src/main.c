@@ -22,6 +22,8 @@
 #include "common.h"
 #include "parser.tab.h"
 extern SymbolTable symtab;
+extern int lex_error_count;
+extern int semantic_error_count;
 
 typedef struct {
     int         token;
