@@ -1,0 +1,40 @@
+(program
+  (list
+    (var-decl let a
+      (number 10)
+    )
+    (var-decl let b
+      (unary -
+        (ident a)
+      )
+    )
+    (var-decl let flag
+      (bool false)
+    )
+    (if
+      (unary !
+        (ident flag)
+      )
+      (block
+        (list
+          (var-decl let c
+            (binary +
+              (ident a)
+              (ident b)
+            )
+          )
+          (block
+            (list
+              (var-decl let d
+                (binary *
+                  (ident c)
+                  (number 2)
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+)
