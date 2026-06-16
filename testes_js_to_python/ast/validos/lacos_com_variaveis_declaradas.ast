@@ -1,0 +1,46 @@
+(program
+  (list
+    (var-decl let i
+      (number 0)
+    )
+    (var-decl let total
+      (number 0)
+    )
+    (while
+      (binary <
+        (ident i)
+        (number 3)
+      )
+      (block
+        (list
+          (expr-stmt
+            (assign += i
+              (number 1)
+            )
+          )
+        )
+      )
+    )
+    (for
+      (var-decl let j
+        (number 0)
+      )
+      (binary <
+        (ident j)
+        (number 2)
+      )
+      (assign += j
+        (number 1)
+      )
+      (block
+        (list
+          (expr-stmt
+            (assign += total
+              (ident j)
+            )
+          )
+        )
+      )
+    )
+  )
+)

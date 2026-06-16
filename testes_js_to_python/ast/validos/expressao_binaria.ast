@@ -1,0 +1,13 @@
+(program
+  (list
+    (var-decl let x
+      (binary +
+        (number 1)
+        (binary *
+          (number 2)
+          (number 3)
+        )
+      )
+    )
+  )
+)

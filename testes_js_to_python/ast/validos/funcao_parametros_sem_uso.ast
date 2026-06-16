@@ -1,0 +1,17 @@
+(program
+  (list
+    (function noop
+      (params
+        (ident a)
+        (ident b)
+      )
+      (block
+        (list
+          (return
+            (number 1)
+          )
+        )
+      )
+    )
+  )
+)
