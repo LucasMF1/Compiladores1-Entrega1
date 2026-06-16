@@ -69,9 +69,11 @@ void generate_code(AstNode *node, FILE *out) {
             break;
 
         case AST_BINARY:
+            fputs("(", out);
             generate_code(node->a, out);
             fprintf(out, " %s ", op_to_python(node->op));
             generate_code(node->b, out);
+            fputs(")", out);
             break;
 
         case AST_UNARY:
@@ -133,6 +135,16 @@ void generate_code(AstNode *node, FILE *out) {
             fputs(":\n", out);
             generate_code(node->b, out);
             break;
+        
+        case AST_BREAK:
+            print_indent(out);
+            fputs("break\n", out);
+            break;
+
+        case AST_CONTINUE:
+            print_indent(out);
+            fputs("continue\n", out);
+            break;
 
         case AST_FUNCTION:
             print_indent(out);
@@ -162,6 +174,46 @@ void generate_code(AstNode *node, FILE *out) {
                 if (i < node->child_count - 1) fputs(", ", out);
             }
             fputs(")", out);
+            break;
+        
+        case AST_FOR:
+            if (node->a) generate_code(node->a, out);
+            
+            print_indent(out);
+            fputs("while ", out);
+            if (node->b) generate_code(node->b, out);
+            else fputs("True", out);
+            fputs(":\n", out);
+            
+            indent_level++;
+            
+            if (node->d) {
+                if (node->d->kind == AST_BLOCK) {
+                    generate_code(node->d->a, out);
+                } else {
+                    generate_code(node->d, out);
+                }
+            }
+            
+            if (node->c) {
+                print_indent(out);
+                generate_code(node->c, out);
+                fputs("\n", out);
+            }
+            
+            indent_level--;
+            break;
+
+        case AST_MEMBER:
+            generate_code(node->a, out);
+            fprintf(out, ".%s", node->sval);
+            break;
+
+        case AST_INDEX:
+            generate_code(node->a, out);
+            fputs("[", out);
+            generate_code(node->b, out);
+            fputs("]", out);
             break;
 
         default:
