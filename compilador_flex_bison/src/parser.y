@@ -72,6 +72,8 @@ void semantic_error(const char *msg, const char *symbol, int line, int column);
 
 /* Precedencia. Linhas posteriores ligam mais forte. */
 %right ASSIGN PLUS_ASSIGN MINUS_ASSIGN TIMES_ASSIGN DIV_ASSIGN MOD_ASSIGN
+%nonassoc IF_WITHOUT_ELSE
+%nonassoc ELSE
 %left  OR
 %left  AND
 %left  BIT_OR
@@ -127,7 +129,8 @@ block
     ;
 
 if_stmt
-    : IF LPAREN expression RPAREN statement                   { $$ = ast_if($3, $5, NULL, @$.first_line, @$.first_column); }
+    : IF LPAREN expression RPAREN statement %prec IF_WITHOUT_ELSE
+                                                            { $$ = ast_if($3, $5, NULL, @$.first_line, @$.first_column); }
     | IF LPAREN expression RPAREN statement ELSE statement    { $$ = ast_if($3, $5, $7,   @$.first_line, @$.first_column); }
     ;
 

@@ -107,8 +107,9 @@ int main(int argc, char **argv) {
     const char *path     = NULL;
     int         i;
 
-    //init tabela de simbolos
-    //sym_init(&symtab);
+    lex_error_count = 0;
+    semantic_error_count = 0;
+
     scope_enter();
 
     for (i = 1; i < argc; ++i) {
@@ -141,17 +142,12 @@ int main(int argc, char **argv) {
     }
 
     int rc = lex_only ? run_lex_only() : yyparse();
-    if (!lex_only && semantic_error_count > 0) rc = 1;
+    if (!lex_only && (lex_error_count > 0 || semantic_error_count > 0)) rc = 1;
     fclose(yyin);
 
     if (!lex_only && rc == 0 && dump_ast && ast_root) {
         ast_print(ast_root, stdout);
     }
-
-    /*
-     * TODO: se rc == 0 e nao for modo --lex, chamar a rotina de geracao de
-     *       codigo Python a partir da AST construida durante o parsing.
-     */
 
     ast_free(ast_root);
     ast_root = NULL;

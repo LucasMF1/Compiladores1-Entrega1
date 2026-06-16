@@ -5,4 +5,5 @@ function soma(a, b) {
 }
 
 // Chamada apos a declaracao deve continuar sendo aceita.
+let resultado;
 resultado = soma(1, 2);
