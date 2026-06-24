@@ -3,31 +3,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Inicialização da tabela */
-void sym_init(SymbolTable *t) {
-    //t->current_scope = 0;
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        t->buckets[i] = NULL;
+void sym_init(SymbolTable *t, unsigned size) {
+    t->size = size;
+    t->buckets = calloc(size, sizeof(Symbol *));
+
+    if (!t->buckets) {
+        fprintf(stderr, "Erro de memoria ao alocar tabela de simbolos\n");
+        exit(1);
     }
 }
 
-static unsigned hash(const char *str) {
+static unsigned hash(const char *str, unsigned size) {
     unsigned h = 0;
 
     while (*str) {
-        h = h * 31 + *str;
+        h = h * 31 + (unsigned char)*str;
         str++;
     }
 
-    return h % TABLE_SIZE;
+    return h % size;
 }
 
- 
-   
 void sym_insert(SymbolTable *t, const char *name, SymbolCategory cat) {
-
-
-    unsigned index = hash(name);
+    unsigned index = hash(name, t->size);
 
     Symbol *sym = malloc(sizeof(Symbol));
     if (!sym) {
@@ -36,86 +34,69 @@ void sym_insert(SymbolTable *t, const char *name, SymbolCategory cat) {
     }
 
     sym->name = strdup(name);
+    if (!sym->name) {
+        fprintf(stderr, "Erro de memoria ao duplicar nome do simbolo\n");
+        free(sym);
+        exit(1);
+    }
+
     sym->category = cat;
-
-    /* Valores temporários/default */
     sym->type = TYPE_NONE;
-    //sym->scope = t->current_scope;
     sym->line = yylineno;
-
-    /* Inserção na cabeça da lista */
     sym->next = t->buckets[index];
-
-    /* Agora o bucket aponta para o novo símbolo */
     t->buckets[index] = sym;
-
-    //printf("Inserindo simbolo '%s' no bucket %u\n", name, index);
 }
 
 Symbol *sym_lookup(SymbolTable *t, const char *name) {
-
-    /* Descobre o bucket onde o símbolo deveria estar */
-    unsigned index = hash(name);
-
-    /* Começa no início da lista encadeada */
+    unsigned index = hash(name, t->size);
     Symbol *current = t->buckets[index];
 
-    /* Percorre a lista */
     while (current != NULL) {
-
-        /* Compara os nomes */
         if (strcmp(current->name, name) == 0) {
             return current;
         }
-
-        /* Vai para o próximo símbolo da lista */
         current = current->next;
     }
 
-    /* Não encontrou */
     return NULL;
 }
 
-/* Liberação de memória */
 void sym_destroy(SymbolTable *t) {
-
-    /* Percorre todos os buckets */
-    for (int i = 0; i < TABLE_SIZE; i++) {
-
-        /* Começa no início da lista */
+    for (unsigned i = 0; i < t->size; i++) {
         Symbol *current = t->buckets[i];
 
-        /* Percorre a linked list */
         while (current != NULL) {
-
-            /* Guarda o próximo antes de liberar */
             Symbol *next = current->next;
-
-            /* Libera a string do nome */
             free(current->name);
-
-            /* Libera o símbolo */
             free(current);
-
-            /* Vai para o próximo */
             current = next;
         }
 
-        /* Bucket agora está vazio */
         t->buckets[i] = NULL;
     }
-}
 
+    free(t->buckets);
+    t->buckets = NULL;
+    t->size = 0;
+}
 
 static Scope *current_scope = NULL;
 
 void scope_enter(void) {
     Scope *scope = malloc(sizeof(Scope));
+    if (!scope) {
+        fprintf(stderr, "Erro de memoria ao alocar escopo\n");
+        exit(1);
+    }
 
-    sym_init(&scope->table);
+    /* Primeiro escopo aberto (current_scope == NULL) é o global:
+       recebe a tabela grande. Os demais (blocos, funções) recebem
+       uma tabela bem menor, já que costumam ter poucos simbolos. */
+    unsigned size = (current_scope == NULL) ? GLOBAL_TABLE_SIZE
+                                             : LOCAL_TABLE_SIZE;
 
+    sym_init(&scope->table, size);
     scope->parent = current_scope;
-
     current_scope = scope;
 }
 
@@ -161,6 +142,7 @@ void scope_exit(void) {
 
     if (current_scope != NULL) {
         current_scope = current_scope->parent;
+        sym_destroy(&old->table);  /* libera Symbols, nomes e buckets */
         free(old);
     }
 }

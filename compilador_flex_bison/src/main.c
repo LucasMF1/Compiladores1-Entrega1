@@ -106,7 +106,6 @@ int main(int argc, char **argv) {
     int         i;
 
     //init tabela de simbolos
-    //sym_init(&symtab);
     scope_enter();
 
     for (i = 1; i < argc; ++i) {
@@ -146,10 +145,6 @@ int main(int argc, char **argv) {
         ast_print(ast_root, stdout);
     }
 
-    /*
-     * TODO: se rc == 0 e nao for modo --lex, chamar a rotina de geracao de
-     *       codigo Python a partir da AST construida durante o parsing.
-     */
 
     ast_free(ast_root);
     ast_root = NULL;
