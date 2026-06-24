@@ -18,6 +18,7 @@
 SymbolTable symtab;
 
 void semantic_error(const char *msg, const char *symbol, int line, int column);
+static Symbol *check_assign_target(const char *name, AstNode *value, int line, int column);
 %}
 
 %locations
@@ -161,9 +162,9 @@ continue_stmt
 //    ;
 
 var_decl
-    : LET   IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_VAR); $$ = ast_var_decl(LET,   $2, $4,   @$.first_line, @$.first_column); }
-    | CONST IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_CONST); $$ = ast_var_decl(CONST, $2, $4,   @$.first_line, @$.first_column); }
-    | VAR   IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, $4,   @$.first_line, @$.first_column); }
+    : LET   IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_VAR); Symbol *s = scope_lookup_current($2); if (s) sym_set_type(s, ast_infer_type($4)); $$ = ast_var_decl(LET, $2, $4, @$.first_line, @$.first_column); }
+    | CONST IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_CONST); Symbol *s = scope_lookup_current($2); if (s) sym_set_type(s, ast_infer_type($4)); $$ = ast_var_decl(CONST, $2, $4, @$.first_line, @$.first_column); }
+    | VAR   IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_VAR); Symbol *s = scope_lookup_current($2); if (s) sym_set_type(s, ast_infer_type($4)); $$ = ast_var_decl(VAR, $2, $4, @$.first_line, @$.first_column); }
     | LET   IDENTIFIER SEMI                     { scope_insert($2, CAT_VAR); $$ = ast_var_decl(LET,   $2, NULL, @$.first_line, @$.first_column); }
     | VAR   IDENTIFIER SEMI                     { scope_insert($2, CAT_VAR); $$ = ast_var_decl(VAR,   $2, NULL, @$.first_line, @$.first_column); }
     ;
@@ -190,12 +191,12 @@ expression
     | expression OR         expression          { $$ = ast_binary(OR,         $1, $3, @$.first_line, @$.first_column); }
     | MINUS expression  %prec UMINUS            { $$ = ast_unary(MINUS, $2, @$.first_line, @$.first_column); }
     | NOT   expression                          { $$ = ast_unary(NOT,   $2, @$.first_line, @$.first_column); }
-    | IDENTIFIER ASSIGN        expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(ASSIGN, $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER PLUS_ASSIGN   expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(PLUS_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER MINUS_ASSIGN  expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(MINUS_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER TIMES_ASSIGN  expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(TIMES_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER DIV_ASSIGN    expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(DIV_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
-    | IDENTIFIER MOD_ASSIGN    expression       { if (scope_lookup($1) == NULL) semantic_error("variavel '%s' nao declarada", $1, @1.first_line, @1.first_column); $$ = ast_assign(MOD_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER ASSIGN       expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(ASSIGN,       $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER PLUS_ASSIGN  expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(PLUS_ASSIGN,  $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER MINUS_ASSIGN expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(MINUS_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER TIMES_ASSIGN expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(TIMES_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER DIV_ASSIGN   expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(DIV_ASSIGN,   $1, $3, @$.first_line, @$.first_column); }
+    | IDENTIFIER MOD_ASSIGN   expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(MOD_ASSIGN,   $1, $3, @$.first_line, @$.first_column); }
     | expression LPAREN arg_list_opt RPAREN     { $$ = ast_call($1, $3, @$.first_line, @$.first_column); }
     | expression DOT IDENTIFIER                 { $$ = ast_member($1, $3, @$.first_line, @$.first_column); }
     | expression LBRACKET expression RBRACKET   { $$ = ast_index($1, $3,  @$.first_line, @$.first_column); }
@@ -245,4 +246,30 @@ void semantic_error(const char *msg, const char *symbol, int line, int column) {
     fprintf(stderr, "Erro semantico: ");
     fprintf(stderr, msg, symbol);
     fprintf(stderr, " na linha %d, coluna %d\n", line, column);
+}
+
+/* Valida uso de identificador em atribuicao: existencia + nao-const.
+ * Retorna o Symbol encontrado (ou NULL se nao declarado). */
+static Symbol *check_assign_target(const char *name, AstNode *value,
+                                   int line, int column) {
+    Symbol *s = scope_lookup(name);
+
+    if (s == NULL) {
+        semantic_error("variavel '%s' nao declarada", name, line, column);
+        return NULL;
+    }
+
+    if (s->category == CAT_CONST) {
+        semantic_error("atribuicao invalida: '%s' e uma constante", name, line, column);
+        return s;
+    }
+
+    if (s->type != TYPE_NONE && value != NULL) {
+        SymbolType new_type = ast_infer_type(value);
+        if (new_type != TYPE_NONE && new_type != s->type) {
+            semantic_error("tipo incompativel na atribuicao de '%s'", name, line, column);
+        }
+    }
+
+    return s;
 }

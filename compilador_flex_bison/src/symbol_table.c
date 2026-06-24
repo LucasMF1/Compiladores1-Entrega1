@@ -80,6 +80,10 @@ void sym_destroy(SymbolTable *t) {
     t->size = 0;
 }
 
+void sym_set_type(Symbol *s, SymbolType t) {
+    if (s) s->type = t;
+}
+
 static Scope *current_scope = NULL;
 
 void scope_enter(void) {

@@ -29,6 +29,7 @@ void sym_init(SymbolTable *t, unsigned size);
 void sym_insert(SymbolTable *t, const char *name, SymbolCategory cat);
 Symbol *sym_lookup(SymbolTable *t, const char *name);
 void sym_destroy(SymbolTable *t);
+void sym_set_type(Symbol *s, SymbolType t);
 
 void scope_enter(void);
 void scope_exit(void);

@@ -308,3 +308,60 @@ static void print_rec(const AstNode *n, FILE *out, int level) {
 void ast_print(const AstNode *node, FILE *out) {
     print_rec(node, out, 0);
 }
+
+SymbolType ast_infer_type(const AstNode *expr) {
+    if (!expr) return TYPE_NONE;
+
+    switch (expr->kind) {
+
+        
+        case AST_NUMBER:    return TYPE_NUMBER;
+        case AST_STRING:    return TYPE_STRING;
+        case AST_BOOL:      return TYPE_BOOL;
+        case AST_NULL:
+        case AST_UNDEFINED: return TYPE_NONE;
+
+        
+        case AST_IDENT: {
+            Symbol *s = scope_lookup(expr->sval);
+            return s ? s->type : TYPE_NONE;
+        }
+
+        case AST_BINARY:
+            switch (expr->op) {
+                case EQ: case NEQ: case STRICT_EQ: case STRICT_NEQ:
+                case LT: case GT:  case LE:  case GE:
+                case AND: case OR:
+                    return TYPE_BOOL;
+                default:
+                    break;
+            }
+            {
+                SymbolType lt = ast_infer_type(expr->a);
+                SymbolType rt = ast_infer_type(expr->b);
+
+                if (expr->op == PLUS) {
+                    
+                    if (lt == TYPE_STRING || rt == TYPE_STRING)
+                        return TYPE_STRING;
+                }
+                if (lt == TYPE_NUMBER && rt == TYPE_NUMBER)
+                    return TYPE_NUMBER;
+                
+                return TYPE_NONE;
+            }
+
+        case AST_UNARY:
+            if (expr->op == NOT) return TYPE_BOOL;
+            return TYPE_NUMBER;
+
+        /* Chamada de funcao: sem tipagem de retorno por ora */
+        case AST_CALL:      return TYPE_NONE;
+
+        
+        case AST_MEMBER:
+        case AST_INDEX:     return TYPE_NONE;
+
+        default:            return TYPE_NONE;
+    }
+}
