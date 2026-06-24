@@ -22,6 +22,7 @@
 #include "common.h"
 #include "parser.tab.h"
 #include "codegen.h"
+#include "optimizer.h"
 extern SymbolTable symtab;
 extern int lex_error_count;
 extern int semantic_error_count;
@@ -151,6 +152,7 @@ int main(int argc, char **argv) {
     }
 
     if (!lex_only && rc == 0 && !dump_ast && ast_root) {
+        optimize(ast_root);
         generate_code(ast_root, stdout);
     }
 

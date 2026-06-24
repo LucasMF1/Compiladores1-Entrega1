@@ -100,6 +100,7 @@ run_case () {
     expected_err_file="${arquivo%.js}.err"
     expected_ast_file="${arquivo%.js}.ast"
     expected_tokens_file="${arquivo%.js}.tokens"
+    expected_py_file="${arquivo%.js}.expected.py"
 
     # Executa capturando stdout e stderr em arquivos separados para debug.
     # Na fase "lexer", roda em modo --lex para imprimir os tokens em stdout.
@@ -154,11 +155,23 @@ run_case () {
         if ! grep -Eq -- "$expected_err" "$stderr_file"; then
             mismatch="stderr nao contem o trecho esperado de $(basename "$expected_err_file")"
         fi
-    elif [ "$PHASE" = "integracao" ] && [ -f "$expected_err_file" ]; then
+    elif [ "$PHASE" = "integracao" ] && [ "$esperado" = "invalid" ] && [ -f "$expected_err_file" ]; then
         expected_err="$(cat "$expected_err_file")"
 
         if ! grep -Eq -- "$expected_err" "$stderr_file"; then
             mismatch="stderr nao contem o trecho esperado de $(basename "$expected_err_file")"
+        fi
+    elif [ "$PHASE" = "integracao" ] && [ "$esperado" = "valid" ] && [ -f "$expected_py_file" ]; then
+        if ! diff -u "$expected_py_file" "$stdout_file" >"$out_subdir/$nome.diff"; then
+            mismatch="saida Python diferente do esperado ($(basename "$expected_py_file"))"
+        else
+            rm -f "$out_subdir/$nome.diff"
+        fi
+    elif [ "$PHASE" = "otimizacao" ] && [ "$esperado" = "valid" ] && [ -f "$expected_py_file" ]; then
+        if ! diff -u "$expected_py_file" "$stdout_file" >"$out_subdir/$nome.diff"; then
+            mismatch="saida Python diferente do esperado ($(basename "$expected_py_file"))"
+        else
+            rm -f "$out_subdir/$nome.diff"
         fi
     elif [ "$PHASE" = "ast" ] && [ "$esperado" = "valid" ]; then
         if [ ! -f "$expected_ast_file" ]; then

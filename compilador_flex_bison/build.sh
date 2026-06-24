@@ -115,6 +115,7 @@ echo "[3/3] Compilando executavel..."
     "$SRC_DIR/symbol_table.c" \
     "$SRC_DIR/ast.c"          \
     "$SRC_DIR/codegen.c"      \
-    -o "$BUILD_DIR/compilador"
+    "$SRC_DIR/optimizer.c"    \
+    -o "$BUILD_DIR/compilador" -lm
 
 echo "OK -> $BUILD_DIR/compilador"
