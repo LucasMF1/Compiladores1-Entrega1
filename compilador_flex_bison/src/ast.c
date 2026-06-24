@@ -308,6 +308,11 @@ static void print_rec(const AstNode *n, FILE *out, int level) {
         case AST_BOOL:       fprintf(out, "(bool %s)\n", n->bval ? "true" : "false"); return;
         case AST_NULL:       fputs("(null)\n", out); return;
         case AST_UNDEFINED:  fputs("(undefined)\n", out); return;
+        case AST_FUNCTION:
+            fprintf(out, "(function %s\n", n->sval ? n->sval : "?");
+            print_rec(n->a, out, level + 1);  /* params */
+            print_rec(n->b, out, level + 1);  /* body   */
+            break;
     }
     indent(out, level);
     fputs(")\n", out);

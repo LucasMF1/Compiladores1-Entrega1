@@ -145,4 +145,58 @@
     "validity": "invalid",
     "input": "integracao/invalidos/erro_sintatico.js"
   }
+  {
+    "id": "parser_const_reatribuicao",
+    "description": "Atribuicao direta a uma constante deve causar erro semantico.",
+    "validity": "invalid",
+    "input": "parser/invalidos/const_reatribuicao.js",
+    "expectedError": "parser/invalidos/const_reatribuicao.err"
+  },
+  {
+    "id": "parser_const_op_composto",
+    "description": "Operador composto (+=) aplicado a constante deve causar erro semantico.",
+    "validity": "invalid",
+    "input": "parser/invalidos/const_op_composto.js",
+    "expectedError": "parser/invalidos/const_op_composto.err"
+  },
+  {
+    "id": "parser_variavel_ja_declarada",
+    "description": "Redeclaracao de variavel no mesmo escopo deve causar erro semantico.",
+    "validity": "invalid",
+    "input": "parser/invalidos/variavel_ja_declarada.js",
+    "expectedError": "parser/invalidos/variavel_ja_declarada.err"
+  },
+  {
+    "id": "parser_tipo_incompativel_assign",
+    "description": "Reatribuicao de variavel numerica com valor string deve causar erro semantico de tipo.",
+    "validity": "invalid",
+    "input": "parser/invalidos/tipo_incompativel_assign.js",
+    "expectedError": "parser/invalidos/tipo_incompativel_assign.err"
+  },
+  {
+    "id": "parser_tipo_incompativel_bool",
+    "description": "Reatribuicao de variavel booleana com numero deve causar erro semantico de tipo.",
+    "validity": "invalid",
+    "input": "parser/invalidos/tipo_incompativel_bool.js",
+    "expectedError": "parser/invalidos/tipo_incompativel_bool.err"
+  },
+  {
+    "id": "parser_tipo_incompativel_op_composto",
+    "description": "Operador += em variavel string com numero deve causar erro semantico de tipo.",
+    "validity": "invalid",
+    "input": "parser/invalidos/tipo_incompativel_op_composto.js",
+    "expectedError": "parser/invalidos/tipo_incompativel_op_composto.err"
+  },
+  {
+    "id": "parser_const_sem_reatribuicao",
+    "description": "Constantes apenas lidas sem reatribuicao devem ser aceitas pelo parser.",
+    "validity": "valid",
+    "input": "parser/validos/const_sem_reatribuicao.js"
+  },
+  {
+    "id": "parser_tipagem_compativel",
+    "description": "Reatribuicoes com o mesmo tipo (number, string, bool) devem ser aceitas.",
+    "validity": "valid",
+    "input": "parser/validos/tipagem_compativel.js"
+  }
 ]

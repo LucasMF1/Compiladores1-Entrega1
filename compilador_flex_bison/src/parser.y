@@ -71,7 +71,8 @@ static Symbol *check_assign_target(const char *name, AstNode *value, int line, i
 %type <node> expression primary
 %type <node> arg_list_opt arg_list
 
-/* Precedencia. Linhas posteriores ligam mais forte. */
+%nonassoc IF_WITHOUT_ELSE
+%nonassoc ELSE
 %right ASSIGN PLUS_ASSIGN MINUS_ASSIGN TIMES_ASSIGN DIV_ASSIGN MOD_ASSIGN
 %left  OR
 %left  AND
@@ -114,12 +115,14 @@ statement
     ;
 
 block
-    : LBRACE stmt_list RBRACE                   { $$ = ast_block($2, @$.first_line, @$.first_column); }
+    : LBRACE { scope_enter(); } stmt_list RBRACE  { $$ = ast_block($3, @$.first_line, @$.first_column); scope_exit(); }
     ;
 
 if_stmt
-    : IF LPAREN expression RPAREN statement                   { $$ = ast_if($3, $5, NULL, @$.first_line, @$.first_column); }
-    | IF LPAREN expression RPAREN statement ELSE statement    { $$ = ast_if($3, $5, $7,   @$.first_line, @$.first_column); }
+    : IF LPAREN expression RPAREN statement %prec IF_WITHOUT_ELSE
+        { $$ = ast_if($3, $5, NULL, @$.first_line, @$.first_column); }
+    | IF LPAREN expression RPAREN statement ELSE statement
+        { $$ = ast_if($3, $5, $7, @$.first_line, @$.first_column); }
     ;
 
 while_stmt
@@ -227,7 +230,17 @@ expression
     | IDENTIFIER TIMES_ASSIGN expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(TIMES_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
     | IDENTIFIER DIV_ASSIGN   expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(DIV_ASSIGN,   $1, $3, @$.first_line, @$.first_column); }
     | IDENTIFIER MOD_ASSIGN   expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(MOD_ASSIGN,   $1, $3, @$.first_line, @$.first_column); }
-    | expression LPAREN arg_list_opt RPAREN     { if ($1 && $1->kind == AST_IDENT) { Symbol *s = scope_lookup($1->sval); if (s && s->category != CAT_FUNC) { semantic_error("'%s' nao e uma funcao", $1->sval, @1.first_line, @1.first_column);}} $$ = ast_call($1, $3, @$.first_line, @$.first_column);}
+    | expression LPAREN arg_list_opt RPAREN
+    {
+        if ($1 && $1->kind == AST_IDENT) {
+            Symbol *s = scope_lookup($1->sval);
+            if (s && s->category != CAT_FUNC && s->type != TYPE_NONE) {
+                semantic_error("'%s' nao e uma funcao", $1->sval,
+                               @1.first_line, @1.first_column);
+            }
+        }
+        $$ = ast_call($1, $3, @$.first_line, @$.first_column);
+    }
     | expression DOT IDENTIFIER                 { $$ = ast_member($1, $3, @$.first_line, @$.first_column); }
     | expression LBRACKET expression RBRACKET   { $$ = ast_index($1, $3,  @$.first_line, @$.first_column); }
     | primary                                   { $$ = $1; }
