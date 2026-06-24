@@ -66,7 +66,7 @@ static Symbol *check_assign_target(const char *name, AstNode *value, int line, i
 %type <node> program stmt_list statement block
 %type <node> if_stmt while_stmt for_stmt return_stmt break_stmt continue_stmt
 %type <node> var_decl expr_stmt
-//falta fazer funcao %type <node> function_decl param_list param_list_opt
+%type <node> function_decl param_list param_list_opt
 %type <node> for_init expr_opt
 %type <node> expression primary
 %type <node> arg_list_opt arg_list
@@ -103,7 +103,7 @@ statement
     : var_decl                                  { $$ = $1; }
     | expr_stmt                                 { $$ = $1; }
     | block                                     { $$ = $1; }
-//    | function_decl                             { $$ = $1; }
+    | function_decl                             { $$ = $1; }
     | if_stmt                                   { $$ = $1; }
     | while_stmt                                { $$ = $1; }
     | for_stmt                                  { $$ = $1; }
@@ -114,7 +114,7 @@ statement
     ;
 
 block
-    : LBRACE {scope_enter();} stmt_list RBRACE                   { $$ = ast_block($3, @$.first_line, @$.first_column); scope_exit();}
+    : LBRACE stmt_list RBRACE                   { $$ = ast_block($2, @$.first_line, @$.first_column); }
     ;
 
 if_stmt
@@ -157,9 +157,39 @@ continue_stmt
     : CONTINUE SEMI                                           { $$ = ast_continue(@$.first_line, @$.first_column); }
     ;
 
-//function_decl
-//    : FUNCTION IDENTIFIER LPAREN param_list_opt RPAREN block  { $$ = ast_function(@$.first_line, @$.first_column);}
-//    ;
+function_decl
+    : FUNCTION IDENTIFIER
+        {
+            scope_insert($2, CAT_FUNC);
+            scope_enter();
+        }
+      LPAREN param_list_opt RPAREN LBRACE stmt_list RBRACE
+        {
+            AstNode *body_block = ast_block($8, @7.first_line, @7.first_column);
+            $$ = ast_function($2, $5, body_block, @$.first_line, @$.first_column);
+            scope_exit();
+        }
+    ;
+
+param_list_opt
+    : /* vazio */                               { $$ = ast_list(@$.first_line, @$.first_column); }
+    | param_list                                { $$ = $1; }
+    ;
+
+param_list
+    : IDENTIFIER
+        {
+            scope_insert($1, CAT_VAR);
+            $$ = ast_list(@$.first_line, @$.first_column);
+            ast_add_child($$, ast_ident($1, @1.first_line, @1.first_column));
+        }
+    | param_list COMMA IDENTIFIER
+        {
+            scope_insert($3, CAT_VAR);
+            ast_add_child($1, ast_ident($3, @3.first_line, @3.first_column));
+            $$ = $1;
+        }
+    ;
 
 var_decl
     : LET   IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_VAR); Symbol *s = scope_lookup_current($2); if (s) sym_set_type(s, ast_infer_type($4)); $$ = ast_var_decl(LET, $2, $4, @$.first_line, @$.first_column); }
@@ -197,7 +227,7 @@ expression
     | IDENTIFIER TIMES_ASSIGN expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(TIMES_ASSIGN, $1, $3, @$.first_line, @$.first_column); }
     | IDENTIFIER DIV_ASSIGN   expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(DIV_ASSIGN,   $1, $3, @$.first_line, @$.first_column); }
     | IDENTIFIER MOD_ASSIGN   expression        { check_assign_target($1, $3, @1.first_line, @1.first_column); $$ = ast_assign(MOD_ASSIGN,   $1, $3, @$.first_line, @$.first_column); }
-    | expression LPAREN arg_list_opt RPAREN     { $$ = ast_call($1, $3, @$.first_line, @$.first_column); }
+    | expression LPAREN arg_list_opt RPAREN     { if ($1 && $1->kind == AST_IDENT) { Symbol *s = scope_lookup($1->sval); if (s && s->category != CAT_FUNC) { semantic_error("'%s' nao e uma funcao", $1->sval, @1.first_line, @1.first_column);}} $$ = ast_call($1, $3, @$.first_line, @$.first_column);}
     | expression DOT IDENTIFIER                 { $$ = ast_member($1, $3, @$.first_line, @$.first_column); }
     | expression LBRACKET expression RBRACKET   { $$ = ast_index($1, $3,  @$.first_line, @$.first_column); }
     | primary                                   { $$ = $1; }

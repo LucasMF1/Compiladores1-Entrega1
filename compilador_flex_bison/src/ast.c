@@ -185,6 +185,14 @@ AstNode *ast_bool(int value, int line, int col) {
 
 AstNode *ast_null(int line, int col)      { return ast_new(AST_NULL, line, col); }
 AstNode *ast_undefined(int line, int col) { return ast_new(AST_UNDEFINED, line, col); }
+AstNode *ast_function(char *name, AstNode *params, AstNode *body,
+                      int line, int col) {
+    AstNode *n = ast_new(AST_FUNCTION, line, col);
+    n->sval = name;  
+    n->a    = params;
+    n->b    = body;
+    return n;
+}
 
 /* ------------------------------------------------------------------------- */
 /* Impressao (s-expression indentada para depuracao)                          */

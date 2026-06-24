@@ -43,7 +43,7 @@
 #define COMPILADOR_AST_H
 
 #include <stdio.h>
-#include "symbol_table.h"   //para SymbolType, usado em ast_infer_type()
+#include "symbol_table.h"  
 
 typedef enum {
     AST_PROGRAM,
@@ -69,7 +69,8 @@ typedef enum {
     AST_STRING,
     AST_BOOL,
     AST_NULL,
-    AST_UNDEFINED
+    AST_UNDEFINED,
+    AST_FUNCTION
 } AstKind;
 
 typedef struct AstNode AstNode;
@@ -126,6 +127,7 @@ AstNode *ast_string(char *value, int line, int col);
 AstNode *ast_bool(int value, int line, int col);
 AstNode *ast_null(int line, int col);
 AstNode *ast_undefined(int line, int col);
+AstNode *ast_function(char *name, AstNode *params, AstNode *body, int line, int col);
 
 /* Infere o SymbolType de um no de expressao.
  * Retorna TYPE_NONE quando nao e possivel determinar estaticamente. */
