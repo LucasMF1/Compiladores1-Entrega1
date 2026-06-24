@@ -17,6 +17,7 @@ AstNode *ast_root = NULL;
 
 AstNode *ast_new(AstKind kind, int line, int column) {
     AstNode *n = (AstNode *)calloc(1, sizeof(AstNode));
+    if (!n) { perror("calloc"); exit(EXIT_FAILURE); }
     n->kind   = kind;
     n->line   = line;
     n->column = column;
@@ -71,6 +72,14 @@ AstNode *ast_var_decl(int decl_kind, char *name, AstNode *init, int line, int co
     n->decl_kind = decl_kind;
     n->sval      = name;     /* posse transferida */
     n->a         = init;
+    return n;
+}
+
+AstNode *ast_function(char *name, AstNode *params, AstNode *body, int line, int col) {
+    AstNode *n = ast_new(AST_FUNCTION, line, col);
+    n->sval = name;   /* posse transferida */
+    n->a    = params;
+    n->b    = body;
     return n;
 }
 
@@ -134,8 +143,6 @@ AstNode *ast_call(AstNode *callee, AstNode *args, int line, int col) {
     AstNode *n = ast_new(AST_CALL, line, col);
     n->a = callee;
     if (args) {
-        /* Move filhos da lista de argumentos para o no de chamada e descarta
-         * o no LIST temporario. */
         n->children    = args->children;
         n->child_count = args->child_count;
         n->child_cap   = args->child_cap;
@@ -244,6 +251,15 @@ static void print_rec(const AstNode *n, FILE *out, int level) {
             fprintf(out, "(var-decl %s %s\n", decl_name(n->decl_kind), n->sval ? n->sval : "?");
             print_rec(n->a, out, level + 1);
             break;
+        case AST_FUNCTION:
+            fprintf(out, "(function %s\n", n->sval ? n->sval : "?");
+            indent(out, level + 1); fputs("(params\n", out);
+            if (n->a) {
+                for (int i = 0; i < n->a->child_count; ++i) print_rec(n->a->children[i], out, level + 2);
+            }
+            indent(out, level + 1); fputs(")\n", out);
+            print_rec(n->b, out, level + 1);
+            break;
         case AST_IF:
             fputs("(if\n", out);
             print_rec(n->a, out, level + 1);
@@ -313,6 +329,7 @@ static void print_rec(const AstNode *n, FILE *out, int level) {
             print_rec(n->a, out, level + 1);  /* params */
             print_rec(n->b, out, level + 1);  /* body   */
             break;
+        default:            fprintf(out, "(unknown-kind=%d)\n", n->kind); return;
     }
     indent(out, level);
     fputs(")\n", out);

@@ -1,0 +1,16 @@
+(program
+  (list
+    (var-decl let f
+      (nil)
+    )
+    (expr-stmt
+      (call
+        (ident f)
+        (args
+          (number 1)
+          (number 2)
+        )
+      )
+    )
+  )
+)

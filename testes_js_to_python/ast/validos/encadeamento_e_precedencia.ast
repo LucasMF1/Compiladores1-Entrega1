@@ -1,0 +1,86 @@
+(program
+  (list
+    (var-decl let obj
+      (nil)
+    )
+    (var-decl let a
+      (number 1)
+    )
+    (var-decl let b
+      (number 2)
+    )
+    (var-decl let c
+      (number 3)
+    )
+    (var-decl let d
+      (number 4)
+    )
+    (var-decl let e
+      (number 5)
+    )
+    (var-decl let ativo
+      (bool false)
+    )
+    (var-decl let pronto
+      (bool true)
+    )
+    (var-decl let extra
+      (bool false)
+    )
+    (var-decl let resultado
+      (nil)
+    )
+    (var-decl let flag
+      (nil)
+    )
+    (var-decl let valor
+      (nil)
+    )
+    (expr-stmt
+      (assign = resultado
+        (index
+          (call
+            (member .soma
+              (ident obj)
+            )
+            (args
+              (ident a)
+              (ident b)
+            )
+          )
+          (number 0)
+        )
+      )
+    )
+    (expr-stmt
+      (assign = flag
+        (binary ||
+          (unary !
+            (ident ativo)
+          )
+          (binary &&
+            (ident pronto)
+            (ident extra)
+          )
+        )
+      )
+    )
+    (expr-stmt
+      (assign = valor
+        (binary /
+          (binary *
+            (binary +
+              (ident a)
+              (ident b)
+            )
+            (binary -
+              (ident c)
+              (ident d)
+            )
+          )
+          (ident e)
+        )
+      )
+    )
+  )
+)

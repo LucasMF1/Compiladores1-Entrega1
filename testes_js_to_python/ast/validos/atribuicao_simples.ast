@@ -1,0 +1,12 @@
+(program
+  (list
+    (var-decl let x
+      (nil)
+    )
+    (expr-stmt
+      (assign = x
+        (number 1)
+      )
+    )
+  )
+)

@@ -25,6 +25,8 @@ OUT_DIR="$ROOT_DIR/build/test_output"
 #   ./test.sh            # casos em testes_js_to_python/validos e /invalidos
 #   ./test.sh parser     # casos em testes_js_to_python/parser/validos|invalidos
 #   ./test.sh lexer      # casos em testes_js_to_python/lexer/validos|invalidos
+#   ./test.sh ast        # casos em testes_js_to_python/ast/validos (+ .ast esperado)
+#   ./test.sh semantic   # casos em testes_js_to_python/semantic/validos|invalidos
 #   ./test.sh -v parser  # verbose: mostra stderr tambem em casos OK
 # -----------------------------------------------------------------------------
 VERBOSE=0
@@ -87,7 +89,7 @@ run_case () {
     local esperado="$2"  # "valid" ou "invalid"
     local categoria="$3" # "validos" ou "invalidos"
     local nome status stderr_output rc out_subdir stdout_file stderr_file status_file
-    local expected_err_file expected_err mismatch
+    local expected_err_file expected_ast_file expected_tokens_file expected_err mismatch
     nome="$(basename "$arquivo")"
 
     out_subdir="$OUT_DIR${PHASE:+/$PHASE}/$categoria"
@@ -96,11 +98,16 @@ run_case () {
     stderr_file="$out_subdir/$nome.stderr"
     status_file="$out_subdir/$nome.status"
     expected_err_file="${arquivo%.js}.err"
+    expected_ast_file="${arquivo%.js}.ast"
+    expected_tokens_file="${arquivo%.js}.tokens"
+    expected_py_file="${arquivo%.js}.expected.py"
 
     # Executa capturando stdout e stderr em arquivos separados para debug.
     # Na fase "lexer", roda em modo --lex para imprimir os tokens em stdout.
     if [ "$PHASE" = "lexer" ]; then
         "$BIN" --lex "$arquivo" >"$stdout_file" 2>"$stderr_file"
+    elif [ "$PHASE" = "ast" ]; then
+        "$BIN" --ast "$arquivo" >"$stdout_file" 2>"$stderr_file"
     else
         "$BIN" "$arquivo" >"$stdout_file" 2>"$stderr_file"
     fi
@@ -123,12 +130,56 @@ run_case () {
     mismatch=""
     if [ "$status" != "$esperado" ]; then
         mismatch="esperado $esperado, obtido $status"
+    elif [ "$PHASE" = "lexer" ] && [ "$esperado" = "valid" ] && [ -f "$expected_tokens_file" ]; then
+        if ! diff -u "$expected_tokens_file" "$stdout_file" >"$out_subdir/$nome.diff"; then
+            mismatch="tokens diferentes do esperado ($(basename "$expected_tokens_file"))"
+        else
+            rm -f "$out_subdir/$nome.diff"
+        fi
+    elif [ "$PHASE" = "lexer" ] && [ "$esperado" = "invalid" ] && [ -f "$expected_err_file" ]; then
+        if ! diff -u "$expected_err_file" "$stderr_file" >"$out_subdir/$nome.diff"; then
+            mismatch="stderr diferente do esperado ($(basename "$expected_err_file"))"
+        else
+            rm -f "$out_subdir/$nome.diff"
+        fi
     elif [ "$PHASE" = "parser" ] && [ -f "$expected_err_file" ]; then
         expected_err="$(cat "$expected_err_file")"
 
         # mudanca aqui de Fq pra Eq pra aceitar regex e as mensagens de erro ficarem mais personalizadas
         if ! grep -Eq -- "$expected_err" "$stderr_file"; then
             mismatch="stderr nao contem o trecho esperado de $(basename "$expected_err_file")"
+        fi
+    elif [ "$PHASE" = "semantic" ] && [ -f "$expected_err_file" ]; then
+        expected_err="$(cat "$expected_err_file")"
+
+        if ! grep -Eq -- "$expected_err" "$stderr_file"; then
+            mismatch="stderr nao contem o trecho esperado de $(basename "$expected_err_file")"
+        fi
+    elif [ "$PHASE" = "integracao" ] && [ "$esperado" = "invalid" ] && [ -f "$expected_err_file" ]; then
+        expected_err="$(cat "$expected_err_file")"
+
+        if ! grep -Eq -- "$expected_err" "$stderr_file"; then
+            mismatch="stderr nao contem o trecho esperado de $(basename "$expected_err_file")"
+        fi
+    elif [ "$PHASE" = "integracao" ] && [ "$esperado" = "valid" ] && [ -f "$expected_py_file" ]; then
+        if ! diff -u "$expected_py_file" "$stdout_file" >"$out_subdir/$nome.diff"; then
+            mismatch="saida Python diferente do esperado ($(basename "$expected_py_file"))"
+        else
+            rm -f "$out_subdir/$nome.diff"
+        fi
+    elif [ "$PHASE" = "otimizacao" ] && [ "$esperado" = "valid" ] && [ -f "$expected_py_file" ]; then
+        if ! diff -u "$expected_py_file" "$stdout_file" >"$out_subdir/$nome.diff"; then
+            mismatch="saida Python diferente do esperado ($(basename "$expected_py_file"))"
+        else
+            rm -f "$out_subdir/$nome.diff"
+        fi
+    elif [ "$PHASE" = "ast" ] && [ "$esperado" = "valid" ]; then
+        if [ ! -f "$expected_ast_file" ]; then
+            mismatch="arquivo esperado ausente: $(basename "$expected_ast_file")"
+        elif ! diff -u "$expected_ast_file" "$stdout_file" >"$out_subdir/$nome.diff"; then
+            mismatch="AST diferente do esperado ($(basename "$expected_ast_file"))"
+        else
+            rm -f "$out_subdir/$nome.diff"
         fi
     fi
 

@@ -28,7 +28,7 @@ O projeto é desenvolvido no contexto da disciplina de **Compiladores 1**, aplic
 ```
 Compiladores1-Entrega1/
 ├── compilador/                  
-│   ├── src/                     # Código-fonte
+│   ├── src/                     # Implementação experimental/incompleta em TypeScript
 │   ├── package.json
 │   ├── package-lock.json
 │   └── tsconfig.json
@@ -119,10 +119,15 @@ gcc -o compilador lex.yy.c parser.tab.c -lfl
 
 ## Como Testar
 
-### Executar todos os testes
+### Executar os testes por fase
 
 ```bash
 bash test.sh
+bash test.sh lexer
+bash test.sh parser
+bash test.sh ast
+bash test.sh semantic
+bash test.sh integracao
 ```
 
 ### Testes manuais
@@ -131,10 +136,10 @@ Utilize os arquivos da pasta `testes_js_to_python/`:
 
 ```bash
 # Teste com entrada válida
-./compilador < testes_js_to_python/validos/exemplo1.js
+./build/compilador ../testes_js_to_python/integracao/validos/programa_simples.js
 
 # Teste com entrada inválida (deve retornar erro)
-./compilador < testes_js_to_python/invalidos/erro_lexico.js
+./build/compilador ../testes_js_to_python/integracao/invalidos/erro_lexico.js
 ```
 
 ---
@@ -143,12 +148,14 @@ Utilize os arquivos da pasta `testes_js_to_python/`:
 
 | Componente | Status |
 |---|---|
-| Analisador Léxico (`lexer.l`) |  Implementado |
-| Analisador Sintático (`parser.y`) |  Implementado |
-| Tabela de Símbolos | Implementado  |
-| AST (Árvore Sintática Abstrata) | 📋 Planejado |
-| Geração de Código Python | 📋 Planejado |
-| Testes de Integração | 📋 Planejado |
+| Analisador Léxico (`lexer.l`) | Implementado e testado (`14/14`) |
+| Analisador Sintático (`parser.y`) | Implementado e testado (`25/25`); sem conflito shift/reduce no build atual |
+| Tabela de Símbolos | Implementada com escopos aninhados, funções e parâmetros |
+| AST (Árvore Sintática Abstrata) | Implementada e testada (`16/16` na fase `ast`) |
+| Geração de Código Python | Em progresso |
+| Otimização de código | 📋 Planejado |
+| Testes de Integração | Implementados para a suíte atual (`10/10`) |
+| `compilador/` (TypeScript) | Experimental/incompleto; não é a implementação principal |
 
 
 ## Como Contribuir / Atualizar
@@ -196,4 +203,3 @@ git push origin feat/nome-da-feature
 ## Licença
 
 Este projeto está licenciado sob a licença **MIT**. Consulte o arquivo [LICENSE](./LICENSE) para mais detalhes. 
-

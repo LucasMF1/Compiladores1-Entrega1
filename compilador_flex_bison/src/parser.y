@@ -64,16 +64,17 @@ static Symbol *check_assign_target(const char *name, AstNode *value, int line, i
 
 /* Tipos das nao-terminais. */
 %type <node> program stmt_list statement block
-%type <node> if_stmt while_stmt for_stmt return_stmt break_stmt continue_stmt
+%type <node> function_decl if_stmt while_stmt for_stmt return_stmt break_stmt continue_stmt
 %type <node> var_decl expr_stmt
-%type <node> function_decl param_list param_list_opt
 %type <node> for_init expr_opt
 %type <node> expression primary
 %type <node> arg_list_opt arg_list
+%type <node> param_list_opt param_list
 
 %nonassoc IF_WITHOUT_ELSE
 %nonassoc ELSE
 %right ASSIGN PLUS_ASSIGN MINUS_ASSIGN TIMES_ASSIGN DIV_ASSIGN MOD_ASSIGN
+
 %left  OR
 %left  AND
 %left  BIT_OR
@@ -102,9 +103,9 @@ stmt_list
 
 statement
     : var_decl                                  { $$ = $1; }
+    | function_decl                             { $$ = $1; }
     | expr_stmt                                 { $$ = $1; }
     | block                                     { $$ = $1; }
-    | function_decl                             { $$ = $1; }
     | if_stmt                                   { $$ = $1; }
     | while_stmt                                { $$ = $1; }
     | for_stmt                                  { $$ = $1; }
@@ -254,6 +255,26 @@ arg_list_opt
 arg_list
     : expression                                { $$ = ast_list(@$.first_line, @$.first_column); ast_add_child($$, $1); }
     | arg_list COMMA expression                 { ast_add_child($1, $3); $$ = $1; }
+    ;
+
+param_list_opt
+    : /* vazio */                               { $$ = ast_list(@$.first_line, @$.first_column); }
+    | param_list                                { $$ = $1; }
+    ;
+
+param_list
+    : IDENTIFIER                                
+        { 
+            scope_insert($1, CAT_VAR);
+            $$ = ast_list(@$.first_line, @$.first_column); 
+            ast_add_child($$, ast_ident($1, @1.first_line, @1.first_column)); 
+        }
+    | param_list COMMA IDENTIFIER               
+        { 
+            scope_insert($3, CAT_VAR);
+            ast_add_child($1, ast_ident($3, @3.first_line, @3.first_column)); 
+            $$ = $1; 
+        }
     ;
 
 primary

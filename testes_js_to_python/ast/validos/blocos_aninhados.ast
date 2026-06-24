@@ -1,0 +1,21 @@
+(program
+  (list
+    (var-decl let x
+      (number 1)
+    )
+    (block
+      (list
+        (var-decl let y
+          (ident x)
+        )
+        (block
+          (list
+            (var-decl let z
+              (ident y)
+            )
+          )
+        )
+      )
+    )
+  )
+)

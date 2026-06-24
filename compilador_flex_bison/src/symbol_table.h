@@ -37,4 +37,5 @@ Symbol *scope_lookup(const char *name);
 void scope_insert(const char *name, SymbolCategory category);
 Symbol *scope_lookup_current(const char *name);
 
+
 #endif

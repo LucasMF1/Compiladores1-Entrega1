@@ -1,0 +1,31 @@
+(program
+  (list
+    (var-decl let cond
+      (bool true)
+    )
+    (var-decl let total
+      (nil)
+    )
+    (if
+      (ident cond)
+      (block
+        (list
+          (expr-stmt
+            (assign = total
+              (number 1)
+            )
+          )
+        )
+      )
+      (block
+        (list
+          (expr-stmt
+            (assign = total
+              (number 2)
+            )
+          )
+        )
+      )
+    )
+  )
+)

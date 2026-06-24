@@ -1,44 +1,3 @@
-/*
- * ===========================================================================
- * ast.h  --  Arvore Sintatica Abstrata (AST) do compilador JS -> Python
- * ===========================================================================
- *
- * Modelo:
- *   Um unico tipo `AstNode` (tagged union) representa qualquer no da arvore.
- *   O campo `kind` indica o que o no e; os campos `a/b/c/d` sao "slots"
- *   de filhos com papeis fixos por kind (ver tabela abaixo); `children[]`
- *   guarda filhos de aridade variavel (lista de statements, lista de
- *   argumentos de chamada).
- *
- *   Por kind:
- *     PROGRAM, BLOCK, LIST   -> children[]
- *     VAR_DECL               -> sval=nome, decl_kind=LET/CONST/VAR, a=init?
- *     IF                     -> a=cond, b=then, c=else?
- *     WHILE                  -> a=cond, b=body
- *     FOR                    -> a=init?, b=cond?, c=update?, d=body
- *     RETURN                 -> a=value?
- *     BREAK / CONTINUE       -> sem filhos
- *     EXPR_STMT              -> a=expr
- *     EMPTY_STMT             -> sem filhos
- *     BINARY                 -> op, a=left, b=right
- *     UNARY                  -> op, a=operand
- *     ASSIGN                 -> op (=, +=, ...), sval=alvo, b=valor
- *     CALL                   -> a=callee, children=args
- *     MEMBER                 -> a=object, sval=propriedade
- *     INDEX                  -> a=object, b=indice
- *     IDENT                  -> sval
- *     NUMBER                 -> nval
- *     STRING                 -> sval
- *     BOOL                   -> bval
- *     NULL / UNDEFINED       -> sem filhos
- *
- *   Posse de strings: o lexer entrega cada lexema como `char*` malloc'd
- *   (strdup). O construtor que recebe uma string assume posse e libera em
- *   ast_free(). Ou seja, o parser nao precisa chamar free() quando passa
- *   o lexema para um construtor de no.
- * ===========================================================================
- */
-
 #ifndef COMPILADOR_AST_H
 #define COMPILADOR_AST_H
 
@@ -50,6 +9,7 @@ typedef enum {
     AST_BLOCK,
     AST_LIST,
     AST_VAR_DECL,
+    AST_FUNCTION,
     AST_IF,
     AST_WHILE,
     AST_FOR,
@@ -105,6 +65,7 @@ AstNode *ast_block(AstNode *body, int line, int col);
 AstNode *ast_list(int line, int col);
 
 AstNode *ast_var_decl(int decl_kind, char *name, AstNode *init, int line, int col);
+AstNode *ast_function(char *name, AstNode *params, AstNode *body, int line, int col);
 AstNode *ast_if(AstNode *cond, AstNode *then_s, AstNode *else_s, int line, int col);
 AstNode *ast_while(AstNode *cond, AstNode *body, int line, int col);
 AstNode *ast_for(AstNode *init, AstNode *cond, AstNode *update, AstNode *body, int line, int col);

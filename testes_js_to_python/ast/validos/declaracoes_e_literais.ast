@@ -1,0 +1,22 @@
+(program
+  (list
+    (var-decl let x
+      (number 1)
+    )
+    (var-decl const nome
+      (string teste)
+    )
+    (var-decl let flag
+      (bool true)
+    )
+    (var-decl let nada
+      (null)
+    )
+    (var-decl let vazio
+      (undefined)
+    )
+    (var-decl let empty
+      (nil)
+    )
+  )
+)

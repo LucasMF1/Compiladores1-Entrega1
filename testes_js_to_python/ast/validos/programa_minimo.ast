@@ -1,0 +1,142 @@
+(program
+  (list
+    (var-decl let max
+      (number 5)
+    )
+    (var-decl let global_flag
+      (bool true)
+    )
+    (var-decl let res
+      (nil)
+    )
+    (function processamentoProfundo
+      (params
+        (ident fator)
+        (ident limite)
+      )
+      (block
+        (list
+          (var-decl let atual
+            (number 0)
+          )
+          (var-decl let contador
+            (number 0)
+          )
+          (if
+            (ident global_flag)
+            (block
+              (list
+                (while
+                  (binary <
+                    (ident contador)
+                    (ident max)
+                  )
+                  (block
+                    (list
+                      (var-decl let passo
+                        (binary *
+                          (ident contador)
+                          (ident fator)
+                        )
+                      )
+                      (if
+                        (binary <
+                          (ident passo)
+                          (ident limite)
+                        )
+                        (block
+                          (list
+                            (for
+                              (var-decl let j
+                                (number 0)
+                              )
+                              (binary <
+                                (ident j)
+                                (number 3)
+                              )
+                              (assign += j
+                                (number 1)
+                              )
+                              (block
+                                (list
+                                  (if
+                                    (binary ==
+                                      (ident atual)
+                                      (number 10)
+                                    )
+                                    (block
+                                      (list
+                                        (break)
+                                      )
+                                    )
+                                    (block
+                                      (list
+                                        (expr-stmt
+                                          (assign += atual
+                                            (number 1)
+                                          )
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                        (block
+                          (list
+                            (expr-stmt
+                              (assign = atual
+                                (binary +
+                                  (ident atual)
+                                  (ident passo)
+                                )
+                              )
+                            )
+                            (expr-stmt
+                              (assign += contador
+                                (number 1)
+                              )
+                            )
+                            (continue)
+                          )
+                        )
+                      )
+                      (expr-stmt
+                        (assign += contador
+                          (number 1)
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+            (block
+              (list
+                (return
+                  (number 0)
+                )
+              )
+            )
+          )
+          (return
+            (ident atual)
+          )
+        )
+      )
+    )
+    (expr-stmt
+      (assign = res
+        (call
+          (ident processamentoProfundo)
+          (args
+            (number 2)
+            (number 8)
+          )
+        )
+      )
+    )
+  )
+)
