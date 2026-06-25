@@ -175,26 +175,6 @@ function_decl
         }
     ;
 
-param_list_opt
-    : /* vazio */                               { $$ = ast_list(@$.first_line, @$.first_column); }
-    | param_list                                { $$ = $1; }
-    ;
-
-param_list
-    : IDENTIFIER
-        {
-            scope_insert($1, CAT_VAR);
-            $$ = ast_list(@$.first_line, @$.first_column);
-            ast_add_child($$, ast_ident($1, @1.first_line, @1.first_column));
-        }
-    | param_list COMMA IDENTIFIER
-        {
-            scope_insert($3, CAT_VAR);
-            ast_add_child($1, ast_ident($3, @3.first_line, @3.first_column));
-            $$ = $1;
-        }
-    ;
-
 var_decl
     : LET   IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_VAR); Symbol *s = scope_lookup_current($2); if (s) sym_set_type(s, ast_infer_type($4)); $$ = ast_var_decl(LET, $2, $4, @$.first_line, @$.first_column); }
     | CONST IDENTIFIER ASSIGN expression SEMI   { scope_insert($2, CAT_CONST); Symbol *s = scope_lookup_current($2); if (s) sym_set_type(s, ast_infer_type($4)); $$ = ast_var_decl(CONST, $2, $4, @$.first_line, @$.first_column); }
