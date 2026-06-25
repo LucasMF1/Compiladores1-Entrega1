@@ -192,14 +192,6 @@ AstNode *ast_bool(int value, int line, int col) {
 
 AstNode *ast_null(int line, int col)      { return ast_new(AST_NULL, line, col); }
 AstNode *ast_undefined(int line, int col) { return ast_new(AST_UNDEFINED, line, col); }
-AstNode *ast_function(char *name, AstNode *params, AstNode *body,
-                      int line, int col) {
-    AstNode *n = ast_new(AST_FUNCTION, line, col);
-    n->sval = name;  
-    n->a    = params;
-    n->b    = body;
-    return n;
-}
 
 /* ------------------------------------------------------------------------- */
 /* Impressao (s-expression indentada para depuracao)                          */
@@ -324,10 +316,7 @@ static void print_rec(const AstNode *n, FILE *out, int level) {
         case AST_BOOL:       fprintf(out, "(bool %s)\n", n->bval ? "true" : "false"); return;
         case AST_NULL:       fputs("(null)\n", out); return;
         case AST_UNDEFINED:  fputs("(undefined)\n", out); return;
-        case AST_FUNCTION:
-            fprintf(out, "(function %s\n", n->sval ? n->sval : "?");
-            print_rec(n->a, out, level + 1);  /* params */
-            print_rec(n->b, out, level + 1);  /* body   */
+        
             break;
         default:            fprintf(out, "(unknown-kind=%d)\n", n->kind); return;
     }
