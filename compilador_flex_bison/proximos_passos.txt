@@ -1,0 +1,255 @@
+COMPILADOR JS -> PYTHON
+STATUS ATUAL E PROXIMOS PASSOS
+==========================================
+
+STATUS GERAL
+-------------
+[OK] Lexer funcionando
+[OK] Parser funcionando
+[OK] AST sendo criada
+[OK] Symbol table implementada
+[OK] hash()
+[OK] sym_insert()
+[OK] sym_lookup()
+[OK] sym_destroy()
+[OK] Integração inicial parser.y -> symbol table
+[OK] Inserção de variáveis funcionando
+[OK] Lookup de variáveis funcionando
+[OK] Detecção simples de variável não declarada
+[OK] Build e execução funcionando
+
+OBSERVAÇÃO
+-----------
+A integração atual no parser.y foi apenas um teste inicial.
+Agora começa a implementação REAL da análise semântica.
+
+OBJETIVO AGORA
+----------------
+Transformar a symbol table em um sistema semântico completo.
+O parser.y agora precisa:
+- inserir símbolos corretamente
+- consultar símbolos corretamente
+- validar regras semânticas
+- controlar escopo
+- detectar erros reais de linguagem
+
+
+==========================================================
+FASE 2 — DECLARAÇÕES (INSERT)
+==========================================================
+
+IMPORTANTE:
+sym_insert() só deve acontecer quando algo é DECLARADO.
+
+Atualmente:
+[OK] let
+[OK] var
+[OK] const
+
+Ainda falta:
+[ ] function declarations
+[ ] parâmetros de função
+[ ] classes (se forem suportadas)
+[ ] imports (se forem suportados)
+
+==========================================================
+FASE 3 — USO DE IDENTIFICADORES (LOOKUP)
+==========================================================
+
+IMPORTANTE:
+sym_lookup() só deve acontecer quando algo é USADO.
+
+Atualmente:
+[OK] primary -> IDENTIFIER
+
+Ainda falta verificar:
+
+[x] IDENTIFIER ASSIGN expression
+[x] IDENTIFIER PLUS_ASSIGN expression
+[x] IDENTIFIER MINUS_ASSIGN expression
+[x] IDENTIFIER TIMES_ASSIGN expression
+[x] IDENTIFIER DIV_ASSIGN expression
+[x] IDENTIFIER MOD_ASSIGN expression
+
+Objetivo:
+detectar uso de variável não declarada.
+
+Exemplo inválido:
+    x = 10;
+
+==========================================================
+FASE 4 — CATEGORIAS CORRETAS
+==========================================================
+
+Atualmente:
+[x] parser.y ainda usa CAT_VAR em alguns lugares errados
+
+Corrigir:
+
+let   -> CAT_VAR
+var   -> CAT_VAR
+const -> CAT_CONST
+function -> CAT_FUNC
+
+Objetivo:
+permitir validações futuras.
+ 
+==========================================================
+FASE 5 — CONTROLE DE ESCOPO
+==========================================================
+
+PRÓXIMO GRANDE PASSO.
+
+Atualmente:
+[ ] tabela é global apenas
+
+Problema:
+variáveis continuam existindo fora do bloco.
+
+Implementar:
+
+[ ] current_scope
+[ ] aumentar scope ao entrar em bloco
+[ ] diminuir scope ao sair
+[ ] salvar scope dentro do Symbol
+
+Modificar:
+[ ] sym_insert()
+[ ] sym_lookup()
+
+==========================================================
+FASE 6 — REDECLARAÇÃO CORRETA
+==========================================================
+
+Atualmente:
+[ ] lookup global simples
+
+Problema:
+não diferencia escopos.
+
+Implementar:
+[ ] sym_lookup_current_scope()
+
+Objetivo:
+permitir shadowing válido.
+
+Válido:
+{
+    let x = 10;
+    {
+        let x = 20;
+    }
+}
+
+Inválido:
+{
+    let x = 10;
+    let x = 20;
+}
+
+==========================================================
+FASE 7 — CONST SEMÂNTICO
+==========================================================
+
+Objetivo:
+detectar atribuição em constante.
+
+Exemplo inválido:
+    const x = 10;
+    x = 20;
+
+Necessário:
+[ ] lookup antes de assign
+[ ] verificar categoria do símbolo
+[ ] erro se CAT_CONST
+
+==========================================================
+FASE 8 — TIPAGEM (FUTURO)
+==========================================================
+
+Atualmente:
+[ ] tipos existem mas não são usados
+
+SymbolType:
+- TYPE_NUMBER
+- TYPE_STRING
+- TYPE_BOOL
+
+Implementar:
+[ ] inferência básica
+[ ] salvar tipo no símbolo
+[ ] validar operações
+
+Exemplo:
+    let x = 10;
+    x = "abc";
+
+==========================================================
+FASE 9 — FUNÇÕES
+==========================================================
+
+Implementar:
+[ ] declaração de função
+[ ] inserção CAT_FUNC
+[ ] parâmetros no escopo local
+[ ] escopo interno da função
+
+Validar:
+[ ] função duplicada
+[ ] chamada de função inexistente
+
+==========================================================
+FASE 10 — MELHORIAS DE ARQUITETURA
+==========================================================
+
+FUTURO IDEAL:
+separar parser e análise semântica.
+
+Pipeline ideal:
+Lexer
+-> Parser
+-> AST
+-> Semantic Analyzer
+
+Mas:
+fazer semântica dentro do parser.y ainda é aceitável para o projeto.
+
+==========================================================
+TOKENS/REGRAS QUE PRECISAM MEXER
+==========================================================
+
+DECLARAÇÕES (INSERT)
+--------------------
+var_decl
+for_init
+function declaration (futuro)
+
+USO DE VARIÁVEIS (LOOKUP)
+--------------------------
+primary -> IDENTIFIER
+
+assign expressions:
+- ASSIGN
+- PLUS_ASSIGN
+- MINUS_ASSIGN
+- TIMES_ASSIGN
+- DIV_ASSIGN
+- MOD_ASSIGN
+
+ESCOPO
+-------
+block
+function block (futuro)
+
+==========================================================
+OBJETIVO IMEDIATO
+==========================================================
+
+PRIORIDADE AGORA:
+
+1. terminar checks de lookup nas atribuições
+2. implementar escopo
+3. implementar redeclaração por escopo
+4. implementar validação de const
+
+Isso transforma a tabela de símbolos em análise semântica real.
